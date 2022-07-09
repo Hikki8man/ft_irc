@@ -21,8 +21,14 @@ int Server::createServerSocket(int port) {
 	}
 	// Set socket options
 	int opt = 1;
-	if (setsockopt(_srv_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
+	if (setsockopt(_srv_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
 		perror("setsockopt");
+		return EXIT_FAILURE;
+	}
+
+	// Set socket to NON BLOCK
+	if (fcntl(_srv_fd, F_SETFL, O_NONBLOCK) < 0) {
+		perror("fcntl");
 		return EXIT_FAILURE;
 	}
 
@@ -67,34 +73,17 @@ int Server::newConnection() {
 	newSocket.fd = new_socket;
 	newSocket.events = POLLIN | POLLOUT;
 	_sockets.push_back(newSocket);
+	
 
 	// Add new client to clients list
 	Client newClient(new_socket, client_addr);
 
-	char buffer[1024] = {0};
-
-	// Set Nickname
-	if (recv(new_socket, buffer, 1024, 0) < 0) {
-		perror("recv");
-		return EXIT_FAILURE;
-	}
-	std::string nick(buffer);
-	nick.erase(0, std::string("NICK ").size());
-	newClient.setNickname(nick);
-	// Set Username
-	if (recv(new_socket, buffer, 1024, 0) < 0) {
-		perror("recv");
-		return EXIT_FAILURE;
-	}
-	std::string username(buffer);
-	username.erase(0, std::string("USER ").size());
-	newClient.setUsername(username);
-	_clients[new_socket] = newClient;
-	std::cout << "map size: " << _clients.size() << std::endl;
+	_clients[new_socket] = newClient;;
+	std::cout << "new client socket: " << newSocket.fd << std::endl;
 
 	// Send welcome message to the client
 
-	std::cout << "New connection: " << newClient.getNickname() << std::endl;
+	// std::cout << "New connection: " << newClient.getNickname() << std::endl;
 
 	return 0;
 }
@@ -104,7 +93,7 @@ int Server::run(int port) {
 		return EXIT_FAILURE;
 	}
 	while (1) {
-		int pollRet = poll(_sockets.data(), _sockets.size(), 0);
+		int pollRet = poll(&_sockets[0], _sockets.size(), 0);
 
 		if (pollRet < 0) { // handle errors
 			perror("poll");
@@ -114,14 +103,17 @@ int Server::run(int port) {
 
 			for (SocketIt it = _sockets.begin(); it != _sockets.end(); ++it) {
 				if (it->revents & POLLIN) {
-					for (ClientIt it2 = _clients.begin(); it2 != _clients.end(); ++it2) {
-						std::cout << "client socket: " << it2->second.getSocket() << std::endl;
-					}
-					for (SocketIt it2 = _sockets.begin(); it2 != _sockets.end(); ++it2) {
-						std::cout << "sockets: " << it2->fd << std::endl;
-					}
+					std::cout << "actual fd: " << it->fd << std::endl;
+					// std::cout << "sockets size: " << _sockets.size() << std::endl;
+					// for (ClientIt it2 = _clients.begin(); it2 != _clients.end(); ++it2) {
+					// 	std::cout << "client socket: " << it2->second.getSocket() << std::endl;
+					// }
+					// for (SocketIt it2 = _sockets.begin(); it2 != _sockets.end(); ++it2) {
+					// 	std::cout << "sockets: " << it2->fd << std::endl;
+					// }
 					if (it->fd == _srv_fd) {
 						newConnection();
+						break;
 					}
 					else if (!_clients.empty()) {
 						ClientIt clientIt = _clients.find(it->fd);
