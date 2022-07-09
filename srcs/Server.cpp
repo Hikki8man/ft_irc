@@ -1,0 +1,157 @@
+#include "../includes/Server.hpp"
+
+#define SocketIt std::vector<pollfd>::iterator
+#define ClientIt std::map<SOCKET, Client>::iterator
+
+Server::Server() {}
+
+Server::Server(const Server&) {}
+
+Server& Server::operator=(const Server&) {
+	return *this;
+}
+
+Server::~Server() {}
+
+int Server::createServerSocket(int port) {
+	// Creating socket file descriptor
+	if ((_srv_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+		perror("socket failed");
+		return EXIT_FAILURE;
+	}
+	// Set socket options
+	int opt = 1;
+	if (setsockopt(_srv_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
+		perror("setsockopt");
+		return EXIT_FAILURE;
+	}
+
+	// Setting server address, port and family
+	_srv_addr.sin_family = AF_INET;
+	_srv_addr.sin_addr.s_addr = INADDR_ANY;
+	_srv_addr.sin_port = htons(port);
+
+	// Binding socket to the address and port
+	if (bind(_srv_fd, (struct sockaddr *)&_srv_addr, sizeof(_srv_addr)) < 0) {
+		perror("bind failed");
+		return EXIT_FAILURE;
+	}
+
+	// Listen for incoming connections
+	if (listen(_srv_fd, 15) < 0) {
+		perror("listen");
+		return EXIT_FAILURE;
+	}
+	// Add server socket to poll
+	pollfd serverSocket;
+	serverSocket.fd = _srv_fd;
+	serverSocket.events = POLLIN;
+	_sockets.push_back(serverSocket);
+
+	return 0;
+}
+
+int Server::newConnection() {
+	std::cout << "creating new connection" << std::endl;
+	SOCKET new_socket;
+	struct sockaddr_in client_addr = {0};
+	socklen_t client_addr_len = sizeof(client_addr);
+
+	if ((new_socket = accept(_srv_fd, (struct sockaddr *)&client_addr, &client_addr_len)) < 0) {
+		perror("accept");
+		return EXIT_FAILURE;
+	}
+
+	// Add new socket to poll
+	pollfd newSocket;
+	newSocket.fd = new_socket;
+	newSocket.events = POLLIN | POLLOUT;
+	_sockets.push_back(newSocket);
+
+	// Add new client to clients list
+	Client newClient(new_socket, client_addr);
+
+	char buffer[1024] = {0};
+
+	// Set Nickname
+	if (recv(new_socket, buffer, 1024, 0) < 0) {
+		perror("recv");
+		return EXIT_FAILURE;
+	}
+	std::string nick(buffer);
+	nick.erase(0, std::string("NICK ").size());
+	newClient.setNickname(nick);
+	// Set Username
+	if (recv(new_socket, buffer, 1024, 0) < 0) {
+		perror("recv");
+		return EXIT_FAILURE;
+	}
+	std::string username(buffer);
+	username.erase(0, std::string("USER ").size());
+	newClient.setUsername(username);
+	_clients[new_socket] = newClient;
+	std::cout << "map size: " << _clients.size() << std::endl;
+
+	// Send welcome message to the client
+
+	std::cout << "New connection: " << newClient.getNickname() << std::endl;
+
+	return 0;
+}
+
+int Server::run(int port) {
+	if (createServerSocket(port) < 0) {
+		return EXIT_FAILURE;
+	}
+	while (1) {
+		int pollRet = poll(_sockets.data(), _sockets.size(), 0);
+
+		if (pollRet < 0) { // handle errors
+			perror("poll");
+			break;
+		}
+		else if (pollRet > 0) {
+
+			for (SocketIt it = _sockets.begin(); it != _sockets.end(); ++it) {
+				if (it->revents & POLLIN) {
+					for (ClientIt it2 = _clients.begin(); it2 != _clients.end(); ++it2) {
+						std::cout << "client socket: " << it2->second.getSocket() << std::endl;
+					}
+					for (SocketIt it2 = _sockets.begin(); it2 != _sockets.end(); ++it2) {
+						std::cout << "sockets: " << it2->fd << std::endl;
+					}
+					if (it->fd == _srv_fd) {
+						newConnection();
+					}
+					else if (!_clients.empty()) {
+						ClientIt clientIt = _clients.find(it->fd);
+						if (clientIt == _clients.end()) {
+							_sockets.erase(it);
+							std::cout << "problem" << std::endl;
+							continue;
+						}
+						char buffer[1024] = {0};
+						int ret = recv(it->fd, buffer, 1023, 0);
+						if (ret > 0) {
+							buffer[ret] = '\0';
+							std::cout << "Client " << it->fd << ": " << buffer << std::endl;
+						}
+						else if (ret == 0) {
+							std::cout << "Client " << it->fd << " disconnected" << std::endl;
+							_clients.erase(it->fd);
+							// std::cout << "client after erase: " << _clients.size() << std::endl;
+							it = _sockets.erase(it);
+							// std::cout << "sockets after erase: " << _sockets.size() << std::endl;
+							continue;
+						}
+						else {
+							perror("recv");
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	return 0;
+}
