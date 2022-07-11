@@ -18,14 +18,17 @@ class Client {
 		struct sockaddr_in getAddr() const;
 		std::string getNickname() const;
 		std::string getUsername() const;
+		std::string getBuffer() const;
 
 		void setNickname(const std::string& nick);
 		void setUsername(const std::string& user);
+		void setBuffer(const std::string& buffer);
+
 	private:
 		SOCKET _socket;
 		struct sockaddr_in _addr;
 
-		std::string _nick, _user, _realName;
+		std::string _nick, _user, _realName, _bufferStocked;
 };
 
 #endif

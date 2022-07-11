@@ -1,7 +1,6 @@
 #include "../includes/Server.hpp"
 
-#define SocketIt std::vector<pollfd>::iterator
-#define ClientIt std::map<SOCKET, Client>::iterator
+
 
 Server::Server() {}
 
@@ -63,6 +62,7 @@ int Server::newConnection() {
 	struct sockaddr_in client_addr = {0};
 	socklen_t client_addr_len = sizeof(client_addr);
 
+
 	if ((new_socket = accept(_srv_fd, (struct sockaddr *)&client_addr, &client_addr_len)) < 0) {
 		perror("accept");
 		return EXIT_FAILURE;
@@ -73,18 +73,51 @@ int Server::newConnection() {
 	newSocket.fd = new_socket;
 	newSocket.events = POLLIN | POLLOUT;
 	_sockets.push_back(newSocket);
+
+	std::cout << inet_ntoa(client_addr.sin_addr) << " connected" << std::endl;
 	
 
-	// Add new client to clients list
+	// Add new client to clients list, hummmm
 	Client newClient(new_socket, client_addr);
-
 	_clients[new_socket] = newClient;;
+
 	std::cout << "new client socket: " << newSocket.fd << std::endl;
 
-	// Send welcome message to the client
-
+	
 	// std::cout << "New connection: " << newClient.getNickname() << std::endl;
 
+	return 0;
+}
+
+int Server::recvMsgFrom(SocketIt socket) {
+	char buffer[1024] = {0};
+	Client& client = _clients[socket->fd];
+	int n;
+	if ((n = recv(socket->fd, buffer, 1024, 0)) < 0) {
+		// _clients.erase(socket->fd);
+		// _sockets.erase(socket); ??
+		perror("recv");
+		return 1;
+	}
+	if (n == 0) {
+		std::cout << "Client disconnected" << std::endl;
+		_clients.erase(socket->fd);
+		_sockets.erase(socket);
+		return 1;
+	}
+	client.setBuffer(buffer);
+	std::string msg = client.getBuffer();
+	if (msg.find("\r\n", msg.length() - 2) == std::string::npos)
+		return 0;
+	else {
+		std::string cmd = msg.substr(0, msg.find(" "));
+		// do_cmd
+		// peut il y avoir plusieurs commandes dans la même ligne ?
+		// peut il y avoir plusieurs espaces ?
+		// trop de questions pour le moment
+		// zzzzz ZZZZ
+	}
+	std::cout << "Received: " << buffer << std::endl;
 	return 0;
 }
 
@@ -116,30 +149,33 @@ int Server::run(int port) {
 						break;
 					}
 					else if (!_clients.empty()) {
-						ClientIt clientIt = _clients.find(it->fd);
-						if (clientIt == _clients.end()) {
-							_sockets.erase(it);
-							std::cout << "problem" << std::endl;
-							continue;
-						}
-						char buffer[1024] = {0};
-						int ret = recv(it->fd, buffer, 1023, 0);
-						if (ret > 0) {
-							buffer[ret] = '\0';
-							std::cout << "Client " << it->fd << ": " << buffer << std::endl;
-						}
-						else if (ret == 0) {
-							std::cout << "Client " << it->fd << " disconnected" << std::endl;
-							_clients.erase(it->fd);
-							// std::cout << "client after erase: " << _clients.size() << std::endl;
-							it = _sockets.erase(it);
-							// std::cout << "sockets after erase: " << _sockets.size() << std::endl;
-							continue;
-						}
-						else {
-							perror("recv");
+						if (recvMsgFrom(it) < 0) {
 							break;
 						}
+						// ClientIt clientIt = _clients.find(it->fd);
+						// if (clientIt == _clients.end()) {
+						// 	_sockets.erase(it);
+						// 	std::cout << "problem" << std::endl;
+						// 	break;
+						// }
+						// char buffer[1024] = {0};
+						// int ret = recv(it->fd, buffer, 1023, 0);
+						// if (ret > 0) {
+						// 	buffer[ret] = '\0';
+						// 	std::cout << "Client " << it->fd << ": " << buffer << std::endl;
+						// }
+						// else if (ret == 0) {
+						// 	std::cout << "Client " << it->fd << " disconnected" << std::endl;
+						// 	_clients.erase(it->fd);
+						// 	// std::cout << "client after erase: " << _clients.size() << std::endl;
+						// 	it = _sockets.erase(it);
+						// 	// std::cout << "sockets after erase: " << _sockets.size() << std::endl;
+						// 	break;
+						// }
+						// else {
+						// 	perror("recv");
+						// 	break;
+						// }
 					}
 				}
 			}
