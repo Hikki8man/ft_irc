@@ -53,9 +53,10 @@ CommandCode Server::getCommandCode(const std::string& cmd) {
 void Server::do_cmd(SOCKET sock) {
 	Client& client = _clients[sock];
 	std::string buffer = client.getBuffer();
-	// buffer.erase(0, buffer.find(" ") + 1);
 	buffer.erase(buffer.find_last_of("\r\n"));
 	std::vector<std::string> cmd_args;
+
+	// split the buffer into cmd and args
 	const char* tmp = buffer.c_str();
 	while (tmp) {
 		while (*tmp == ' ')
@@ -72,6 +73,7 @@ void Server::do_cmd(SOCKET sock) {
 		}
 	}
 	client.getBuffer().clear();
+	//=====================
 
 	for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
 		std::cout << "in cmd_args: " << *it << std::endl;
@@ -81,7 +83,14 @@ void Server::do_cmd(SOCKET sock) {
 	std::cout << "COMMAND: " << buffer << "--------------------------------------"  <<std::endl;
 	switch (code)	{
 		case NICK:
+		{
 			// verify of characters are valid
+			std::string restrict(" ,*!@.$:#&");
+			if (cmd_args[1].find_first_of(restrict) != std::string::npos) {
+				//send proper error message
+				std::cout << "NICK: invalid characters" << std::endl;
+				break;
+			}
 			// ---
 			// verify if nick is already used
 			if (nickIsUsed(cmd_args[1])) {
@@ -90,6 +99,8 @@ void Server::do_cmd(SOCKET sock) {
 			} else
 				client.setNickname(cmd_args[1]);
 			break;
+
+		}
 		case USER:
 			// verify of characters are valid
 			// ---
@@ -120,6 +131,7 @@ void Server::do_cmd(SOCKET sock) {
 		std::cout << "Client registered" << std::endl;
 		//send welcome message
 	}
+	cmd_args.clear();
 	std::cout << "--------------------------------------" << std::endl;
 }
 
