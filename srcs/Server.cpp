@@ -53,20 +53,42 @@ CommandCode Server::getCommandCode(const std::string& cmd) {
 void Server::do_cmd(SOCKET sock) {
 	Client& client = _clients[sock];
 	std::string buffer = client.getBuffer();
-	int code = getCommandCode(buffer.substr(0, buffer.find(" ")));
-	std::cout << "COMMAND: " << buffer << "--------------------------------------"  <<std::endl;
-	buffer.erase(0, buffer.find(" ") + 1);
+	// buffer.erase(0, buffer.find(" ") + 1);
 	buffer.erase(buffer.find_last_of("\r\n"));
+	std::vector<std::string> cmd_args;
+	const char* tmp = buffer.c_str();
+	while (tmp) {
+		while (*tmp == ' ')
+			++tmp;
+		size_t pos = std::string(tmp).find(" ");
+		if (pos != std::string::npos) {
+			cmd_args.push_back(std::string(tmp).substr(0, pos));
+			std::cout << "tmp: " << tmp << std::endl;
+			tmp += pos;
+		}
+		else {
+			cmd_args.push_back(std::string(tmp));
+			tmp = NULL;
+		}
+	}
+	client.getBuffer().clear();
+
+	for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
+		std::cout << "in cmd_args: " << *it << std::endl;
+	}
+	
+	int code = getCommandCode(cmd_args[0]);
+	std::cout << "COMMAND: " << buffer << "--------------------------------------"  <<std::endl;
 	switch (code)	{
 		case NICK:
 			// verify of characters are valid
 			// ---
 			// verify if nick is already used
-			if (nickIsUsed(buffer)) {
+			if (nickIsUsed(cmd_args[1])) {
 				// send error message
 				std::cout << "Nickname already used" << std::endl;
 			} else
-				client.setNickname(buffer);
+				client.setNickname(cmd_args[1]);
 			break;
 		case USER:
 			// verify of characters are valid
@@ -77,11 +99,11 @@ void Server::do_cmd(SOCKET sock) {
 				std::cout << "User already registered" << std::endl;
 			}
 			// verify if User is already used
-			else if (userIsUsed(buffer)) {
+			else if (userIsUsed(cmd_args[1])) {
 				// send error message
 				std::cout << "Username already used" << std::endl;
 			} else
-				client.setUsername(buffer);
+				client.setUsername(cmd_args[1]);
 			break;
 		case UNKNOWN:
 			// send error message
@@ -92,7 +114,7 @@ void Server::do_cmd(SOCKET sock) {
 	}
 	std::cout << "Client nickname: " << client.getNickname() << std::endl;
 	std::cout << "Client username: " << client.getUsername() << std::endl;
-	client.getBuffer().clear();
+
 	if (!client.isRegistered() && !client.getNickname().empty() && !client.getUsername().empty()) {
 		client.setRegistered(true);
 		std::cout << "Client registered" << std::endl;
@@ -197,9 +219,12 @@ int Server::recvMsgFrom(SocketIt socket) {
 	client.setBuffer(buffer);
 	std::string msg = client.getBuffer();
 	// std::cout << "msg: " << msg << std::endl;
-	if (msg.find("\r\n", msg.length() - 2) == std::string::npos)
+	if (msg.find("\r\n", msg.length() - 2) == std::string::npos) {
+		std::cout << "msg not complete in:" << std::endl;
 		return 0;
+	}
 	else {
+		std::cout << "msg: " << msg << std::endl;
 		do_cmd(socket->fd);
 		// do_cmd
 		// peut il y avoir plusieurs commandes dans la même ligne ?
