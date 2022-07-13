@@ -3,6 +3,7 @@
 
 #include "Client.hpp"
 #include "NumericRepliesCode.hpp"
+#include "CommandCode.hpp"
 
 #include "sys/socket.h"
 #include "poll.h"
@@ -31,6 +32,11 @@ class Server {
 		int createServerSocket(int port);
 		int newConnection();
 		int recvMsgFrom(SocketIt);
+		enum CommandCode getCommandCode(const std::string&);
+		void do_cmd(SOCKET);
+
+		bool nickIsUsed(const std::string&);
+		bool userIsUsed(const std::string&);
 
 		// Server socket && address
 		SOCKET _srv_fd;

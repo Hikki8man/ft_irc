@@ -1,8 +1,8 @@
 #include "../includes/Server.hpp"
 
-Client::Client() {}
+Client::Client() : _socket(), _addr(), _registered(false) {}
 
-Client::Client(int socket, struct sockaddr_in addr) : _socket(socket), _addr(addr) {}
+Client::Client(int socket, struct sockaddr_in addr) : _socket(socket), _addr(addr), _registered(false) {}
 
 Client::Client(const Client& other) {
 	*this = other;
@@ -15,6 +15,8 @@ Client& Client::operator=(const Client& other) {
 		_realName = other._realName;
 		_socket = other._socket;
 		_addr = other._addr;
+		_bufferStocked = other._bufferStocked;
+		_registered = other._registered;
 	}
 	return *this;
 }
@@ -29,12 +31,16 @@ struct sockaddr_in Client::getAddr() const {
 	return _addr;
 }
 
-std::string Client::getNickname() const {
+std::string& Client::getNickname() {
 	return _nick;
 }
 
-std::string Client::getUsername() const {
+std::string& Client::getUsername() {
 	return _user;
+}
+
+std::string& Client::getBuffer() {
+	return _bufferStocked;
 }
 
 void Client::setNickname(const std::string& nick) {
@@ -43,4 +49,16 @@ void Client::setNickname(const std::string& nick) {
 
 void Client::setUsername(const std::string& user) {
 	_user = user;
+}
+
+void Client::setBuffer(const std::string& buffer) {
+	_bufferStocked += buffer;
+}
+
+void Client::setRegistered(bool registered) {
+	_registered = registered;
+}
+
+bool Client::isRegistered() const {
+	return _registered;
 }

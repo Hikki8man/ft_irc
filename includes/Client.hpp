@@ -16,15 +16,19 @@ class Client {
 
 		int getSocket() const;
 		struct sockaddr_in getAddr() const;
-		std::string getNickname() const;
-		std::string getUsername() const;
-		std::string getBuffer() const;
+		std::string& getNickname();
+		std::string& getUsername();
+		std::string& getBuffer();
 
 		void setNickname(const std::string& nick);
 		void setUsername(const std::string& user);
 		void setBuffer(const std::string& buffer);
+		void setRegistered(bool);
+
+		bool isRegistered() const;
 
 	private:
+		bool _registered;
 		SOCKET _socket;
 		struct sockaddr_in _addr;
 

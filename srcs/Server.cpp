@@ -12,6 +12,95 @@ Server& Server::operator=(const Server&) {
 
 Server::~Server() {}
 
+bool Server::nickIsUsed(const std::string& nick) {
+	for (ClientIt it = _clients.begin(); it != _clients.end(); it++) {
+		if (it->second.getNickname() == nick)
+			return true;
+	}
+	return false;
+}
+
+bool Server::userIsUsed(const std::string& user) {
+	for (ClientIt it = _clients.begin(); it != _clients.end(); it++) {
+		if (it->second.getUsername() == user)
+			return true;
+	}
+	return false;
+}
+
+CommandCode Server::getCommandCode(const std::string& cmd) {
+	if (cmd == "NICK") {
+		return NICK;
+	} else if (cmd == "USER") {
+		return USER;
+	} else if (cmd == "JOIN") {
+		return JOIN;
+	} else if (cmd == "PART") {
+		return PART;
+	} else if (cmd == "QUIT") {
+		return QUIT;
+	} else if (cmd == "PRIVMSG") {
+		return PRIVMSG;
+	} else if (cmd == "PING") {
+		return PING;
+	} else if (cmd == "PONG") {
+		return PONG;
+	} else {
+		return UNKNOWN;
+	}
+}
+
+void Server::do_cmd(SOCKET sock) {
+	Client& client = _clients[sock];
+	std::string buffer = client.getBuffer();
+	int code = getCommandCode(buffer.substr(0, buffer.find(" ")));
+	std::cout << "COMMAND: " << buffer << "--------------------------------------"  <<std::endl;
+	buffer.erase(0, buffer.find(" ") + 1);
+	buffer.erase(buffer.find_last_of("\r\n"));
+	switch (code)	{
+		case NICK:
+			// verify of characters are valid
+			// ---
+			// verify if nick is already used
+			if (nickIsUsed(buffer)) {
+				// send error message
+				std::cout << "Nickname already used" << std::endl;
+			} else
+				client.setNickname(buffer);
+			break;
+		case USER:
+			// verify of characters are valid
+			// ---
+			// verify if User already registered
+			if (client.isRegistered()) {
+				// send error message
+				std::cout << "User already registered" << std::endl;
+			}
+			// verify if User is already used
+			else if (userIsUsed(buffer)) {
+				// send error message
+				std::cout << "Username already used" << std::endl;
+			} else
+				client.setUsername(buffer);
+			break;
+		case UNKNOWN:
+			// send error message
+			std::cout << "Unknown command" << std::endl;
+			break;
+		default:
+			break;
+	}
+	std::cout << "Client nickname: " << client.getNickname() << std::endl;
+	std::cout << "Client username: " << client.getUsername() << std::endl;
+	client.getBuffer().clear();
+	if (!client.isRegistered() && !client.getNickname().empty() && !client.getUsername().empty()) {
+		client.setRegistered(true);
+		std::cout << "Client registered" << std::endl;
+		//send welcome message
+	}
+	std::cout << "--------------------------------------" << std::endl;
+}
+
 int Server::createServerSocket(int port) {
 	// Creating socket file descriptor
 	if ((_srv_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -107,17 +196,18 @@ int Server::recvMsgFrom(SocketIt socket) {
 	}
 	client.setBuffer(buffer);
 	std::string msg = client.getBuffer();
+	// std::cout << "msg: " << msg << std::endl;
 	if (msg.find("\r\n", msg.length() - 2) == std::string::npos)
 		return 0;
 	else {
-		std::string cmd = msg.substr(0, msg.find(" "));
+		do_cmd(socket->fd);
 		// do_cmd
 		// peut il y avoir plusieurs commandes dans la même ligne ?
 		// peut il y avoir plusieurs espaces ?
 		// trop de questions pour le moment
 		// zzzzz ZZZZ
 	}
-	std::cout << "Received: " << buffer << std::endl;
+	// std::cout << "Received: " << buffer << std::endl;
 	return 0;
 }
 
@@ -136,7 +226,7 @@ int Server::run(int port) {
 
 			for (SocketIt it = _sockets.begin(); it != _sockets.end(); ++it) {
 				if (it->revents & POLLIN) {
-					std::cout << "actual fd: " << it->fd << std::endl;
+					// std::cout << "actual fd: " << it->fd << std::endl;
 					// std::cout << "sockets size: " << _sockets.size() << std::endl;
 					// for (ClientIt it2 = _clients.begin(); it2 != _clients.end(); ++it2) {
 					// 	std::cout << "client socket: " << it2->second.getSocket() << std::endl;
