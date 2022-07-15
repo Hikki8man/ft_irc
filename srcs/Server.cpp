@@ -50,21 +50,31 @@ CommandCode Server::getCommandCode(const std::string& cmd) {
 	}
 }
 
-void Server::do_cmd(SOCKET sock) {
-	Client& client = _clients[sock];
+int Server::sendMsgTo(const Client& client, const std::string& code) {
+	std::string msg = ":" + _srv_ip + " " + code + " " + client.getNickname() + " :"; // probably need to change that in future
+	if (code == RPL_WELCOME) {
+		msg += "Welcome to the IRC server " + client.getNickname() + "!" + "\r\n";
+		std::cout << msg << std::endl;
+		return send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+	return -1;
+}
+
+void Server::do_cmd(pollfd& sock) {
+	Client& client = _clients[sock.fd];
 	std::string buffer = client.getBuffer();
-	buffer.erase(buffer.find_last_of("\r\n"));
 	std::vector<std::string> cmd_args;
+
+	buffer.erase(buffer.find_last_of("\r")); // \n ?
 
 	// split the buffer into cmd and args
 	const char* tmp = buffer.c_str();
 	while (tmp) {
-		while (*tmp == ' ')
+		while (*tmp == ' ') 
 			++tmp;
 		size_t pos = std::string(tmp).find(" ");
 		if (pos != std::string::npos) {
 			cmd_args.push_back(std::string(tmp).substr(0, pos));
-			std::cout << "tmp: " << tmp << std::endl;
 			tmp += pos;
 		}
 		else {
@@ -75,13 +85,12 @@ void Server::do_cmd(SOCKET sock) {
 	client.getBuffer().clear();
 	//=====================
 
-	for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
-		std::cout << "in cmd_args: " << *it << std::endl;
-	}
+	// for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
+	// 	std::cout << "in cmd_args: " << *it << std::endl;
+	// }
 	
 	int code = getCommandCode(cmd_args[0]);
-	std::cout << "COMMAND: " << buffer << "--------------------------------------"  <<std::endl;
-	switch (code)	{
+	switch (code) {
 		case NICK:
 		{
 			// verify of characters are valid
@@ -102,6 +111,26 @@ void Server::do_cmd(SOCKET sock) {
 
 		}
 		case USER:
+		{
+			bool foundRealName = false;
+			for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
+				if (it->find(":", 0, 1) != std::string::npos) {
+					foundRealName = true;
+					std::string realName = it->c_str() + 1;
+					++it;
+					while (it != cmd_args.end()) {
+						realName += " " + *it;
+						++it;
+					}
+					client.setRealName(realName);
+					std::cout << "REALNAME: " << client.getRealName() << std::endl;
+					break;
+				}
+			}
+			if (!foundRealName) {
+				//send ERR_NEEDMOREPARAMS
+				std::cout << "USER: no real name" << std::endl;
+			}
 			// verify of characters are valid
 			// ---
 			// verify if User already registered
@@ -116,6 +145,7 @@ void Server::do_cmd(SOCKET sock) {
 			} else
 				client.setUsername(cmd_args[1]);
 			break;
+		}
 		case UNKNOWN:
 			// send error message
 			std::cout << "Unknown command" << std::endl;
@@ -129,7 +159,12 @@ void Server::do_cmd(SOCKET sock) {
 	if (!client.isRegistered() && !client.getNickname().empty() && !client.getUsername().empty()) {
 		client.setRegistered(true);
 		std::cout << "Client registered" << std::endl;
-		//send welcome message
+		if (sock.revents & POLLOUT)
+			sendMsgTo(client, RPL_WELCOME);
+		else {
+			std::cout << "Client not ready" << std::endl;
+		}
+		//send welcome message + check pollout
 	}
 	cmd_args.clear();
 	std::cout << "--------------------------------------" << std::endl;
@@ -174,6 +209,7 @@ int Server::createServerSocket(int port) {
 	pollfd serverSocket;
 	serverSocket.fd = _srv_fd;
 	serverSocket.events = POLLIN;
+	_srv_ip = inet_ntoa(_srv_addr.sin_addr);
 	_sockets.push_back(serverSocket);
 
 	return 0;
@@ -223,29 +259,24 @@ int Server::recvMsgFrom(SocketIt socket) {
 		return 1;
 	}
 	if (n == 0) {
-		std::cout << "Client disconnected" << std::endl;
+		std::cout << client.getNickname() << " disconnected" << std::endl;
 		_clients.erase(socket->fd);
 		_sockets.erase(socket);
-		return 1;
+		return 0;
 	}
 	client.setBuffer(buffer);
 	std::string msg = client.getBuffer();
 	// std::cout << "msg: " << msg << std::endl;
-	if (msg.find("\r\n", msg.length() - 2) == std::string::npos) {
+	if (msg.find("\r\n") == std::string::npos) {
 		std::cout << "msg not complete in:" << std::endl;
-		return 0;
+		return 1;
 	}
 	else {
 		std::cout << "msg: " << msg << std::endl;
-		do_cmd(socket->fd);
-		// do_cmd
-		// peut il y avoir plusieurs commandes dans la même ligne ?
-		// peut il y avoir plusieurs espaces ?
-		// trop de questions pour le moment
-		// zzzzz ZZZZ
+		do_cmd(*socket);
 	}
 	// std::cout << "Received: " << buffer << std::endl;
-	return 0;
+	return 1;
 }
 
 int Server::run(int port) {
@@ -253,6 +284,7 @@ int Server::run(int port) {
 		return EXIT_FAILURE;
 	}
 	while (1) {
+		// Check for activity on all sockets
 		int pollRet = poll(&_sockets[0], _sockets.size(), 0);
 
 		if (pollRet < 0) { // handle errors
@@ -260,49 +292,16 @@ int Server::run(int port) {
 			break;
 		}
 		else if (pollRet > 0) {
-
 			for (SocketIt it = _sockets.begin(); it != _sockets.end(); ++it) {
 				if (it->revents & POLLIN) {
-					// std::cout << "actual fd: " << it->fd << std::endl;
-					// std::cout << "sockets size: " << _sockets.size() << std::endl;
-					// for (ClientIt it2 = _clients.begin(); it2 != _clients.end(); ++it2) {
-					// 	std::cout << "client socket: " << it2->second.getSocket() << std::endl;
-					// }
-					// for (SocketIt it2 = _sockets.begin(); it2 != _sockets.end(); ++it2) {
-					// 	std::cout << "sockets: " << it2->fd << std::endl;
-					// }
 					if (it->fd == _srv_fd) {
 						newConnection();
 						break;
 					}
 					else if (!_clients.empty()) {
-						if (recvMsgFrom(it) < 0) {
+						if (!recvMsgFrom(it)) {
 							break;
 						}
-						// ClientIt clientIt = _clients.find(it->fd);
-						// if (clientIt == _clients.end()) {
-						// 	_sockets.erase(it);
-						// 	std::cout << "problem" << std::endl;
-						// 	break;
-						// }
-						// char buffer[1024] = {0};
-						// int ret = recv(it->fd, buffer, 1023, 0);
-						// if (ret > 0) {
-						// 	buffer[ret] = '\0';
-						// 	std::cout << "Client " << it->fd << ": " << buffer << std::endl;
-						// }
-						// else if (ret == 0) {
-						// 	std::cout << "Client " << it->fd << " disconnected" << std::endl;
-						// 	_clients.erase(it->fd);
-						// 	// std::cout << "client after erase: " << _clients.size() << std::endl;
-						// 	it = _sockets.erase(it);
-						// 	// std::cout << "sockets after erase: " << _sockets.size() << std::endl;
-						// 	break;
-						// }
-						// else {
-						// 	perror("recv");
-						// 	break;
-						// }
 					}
 				}
 			}
