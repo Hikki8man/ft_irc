@@ -54,7 +54,7 @@ CommandCode Server::getCommandCode(const std::string& cmd) {
 	}
 }
 
-void Server::do_cmd(SOCKET sock) {
+void Server::do_cmd(pollfd& sock) {
 	Client& client = _clients[sock.fd];
 	std::vector<std::string> cmd_args = splitClientBuffer(client);
 
@@ -62,7 +62,6 @@ void Server::do_cmd(SOCKET sock) {
 		std::cout << "in cmd_args: " << *it << std::endl;
 	}
 	
-	std::cout << "COMMAND: " << buffer << "--------------------------------------"  <<std::endl;
 
 	std::transform(cmd_args[0].begin(), cmd_args[0].end(), cmd_args[0].begin(), ::tolower);
 

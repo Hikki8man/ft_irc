@@ -18,7 +18,7 @@ CommandExecutor *CommandManager::getCommand(const std::string& name)
 {
 	if (_commands.find(name) != _commands.end())
 		return _commands[name];
-	return nullptr;
+	return NULL;
 }
 
 std::map<std::string, CommandExecutor*> CommandManager::getCommands()
