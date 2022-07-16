@@ -1,4 +1,4 @@
-#include "../includes/Server.hpp"
+#include "../includes/Client.hpp"
 
 Client::Client() : _socket(), _addr(), _registered(false) {}
 
@@ -31,12 +31,16 @@ struct sockaddr_in Client::getAddr() const {
 	return _addr;
 }
 
-std::string& Client::getNickname() {
+const std::string Client::getNickname() const {
 	return _nick;
 }
 
-std::string& Client::getUsername() {
+const std::string Client::getUsername() const {
 	return _user;
+}
+
+const std::string Client::getRealName() const {
+	return _realName;
 }
 
 std::string& Client::getBuffer() {
@@ -45,6 +49,10 @@ std::string& Client::getBuffer() {
 
 void Client::setNickname(const std::string& nick) {
 	_nick = nick;
+}
+
+void Client::setRealName(const std::string& realName) {
+	_realName = realName;
 }
 
 void Client::setUsername(const std::string& user) {

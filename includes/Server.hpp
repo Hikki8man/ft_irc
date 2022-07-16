@@ -2,6 +2,7 @@
 #define SERVER_HPP
 
 #include "Client.hpp"
+#include "Channel.hpp"
 #include "NumericRepliesCode.hpp"
 #include "CommandCode.hpp"
 
@@ -17,6 +18,8 @@
 #define SOCKET int
 #define SocketIt std::vector<pollfd>::iterator
 #define ClientIt std::map<SOCKET, Client>::iterator
+
+#define RESTRICTED_CHARACTERS " ,*!@.$:#&"
 
 class Server {
 	public:
@@ -35,12 +38,19 @@ class Server {
 		int createServerSocket(int port);
 		int newConnection();
 		int recvMsgFrom(SocketIt);
+		int sendMsgTo(const Client&, const std::string&);
+
 		enum CommandCode getCommandCode(const std::string&);
-		void do_cmd(SOCKET);
+		void do_cmd(pollfd&);
+		void nickCmd(Client&, std::vector<std::string>&);
+		void joinCmd(Client&, std::vector<std::string>&);
+
+		std::vector<std::string> splitClientBuffer(Client& client);
 
 		// Server socket && address
 		SOCKET _srv_fd;
 		struct sockaddr_in _srv_addr;
+		std::string _srv_ip;
 
 		// list of server and clients socket to poll 
 		std::vector<pollfd> _sockets;
@@ -49,7 +59,7 @@ class Server {
 		std::map<SOCKET, Client> _clients;
 
 		// list of channels
-		// std::vector<Channel> _channels;
+		std::vector<Channel> _channels;
 
 };
 
