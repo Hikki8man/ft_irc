@@ -18,6 +18,8 @@
 #define SocketIt std::vector<pollfd>::iterator
 #define ClientIt std::map<SOCKET, Client>::iterator
 
+#define RESTRICTED_CHARACTERS " ,*!@.$:#&"
+
 class Server {
 	public:
 		Server();
@@ -32,8 +34,13 @@ class Server {
 		int createServerSocket(int port);
 		int newConnection();
 		int recvMsgFrom(SocketIt);
+		int sendMsgTo(const Client&, const std::string&);
+
 		enum CommandCode getCommandCode(const std::string&);
-		void do_cmd(SOCKET);
+		void do_cmd(pollfd&);
+		void nickCmd(Client&, std::vector<std::string>&);
+
+		std::vector<std::string> splitClientBuffer(Client& client);
 
 		bool nickIsUsed(const std::string&);
 		bool userIsUsed(const std::string&);
@@ -41,6 +48,7 @@ class Server {
 		// Server socket && address
 		SOCKET _srv_fd;
 		struct sockaddr_in _srv_addr;
+		std::string _srv_ip;
 
 		// list of server and clients socket to poll 
 		std::vector<pollfd> _sockets;

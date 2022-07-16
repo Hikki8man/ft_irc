@@ -1,7 +1,5 @@
 #include "../includes/Server.hpp"
 
-
-
 Server::Server() {}
 
 Server::Server(const Server&) {}
@@ -28,6 +26,8 @@ bool Server::userIsUsed(const std::string& user) {
 	return false;
 }
 
+// COMMAND HANDLER===========================================================================
+
 CommandCode Server::getCommandCode(const std::string& cmd) {
 	if (cmd == "NICK") {
 		return NICK;
@@ -50,39 +50,25 @@ CommandCode Server::getCommandCode(const std::string& cmd) {
 	}
 }
 
-int Server::sendMsgTo(const Client& client, const std::string& code) {
-	std::string msg = ":" + _srv_ip + " " + code + " " + client.getNickname() + " :"; // probably need to change that in future
-	if (code == RPL_WELCOME) {
-		msg += "Welcome to the IRC server " + client.getNickname() + "!" + "\r\n";
-		std::cout << msg << std::endl;
-		return send(client.getSocket(), msg.c_str(), msg.size(), 0);
-	}
-	return -1;
+void Server::nickCmd(Client& client, std::vector<std::string>& args) {
+	// verify of characters are valid
+			if (args[1].find_first_of(RESTRICTED_CHARACTERS) != std::string::npos) {
+				//send proper error message
+				std::cout << "NICK: invalid characters" << std::endl;
+				return;
+			}
+			// ---
+			// verify if nick is already used
+			if (nickIsUsed(args[1])) {
+				// send error message
+				std::cout << "Nickname already used" << std::endl;
+			} else
+				client.setNickname(args[1]);
 }
 
 void Server::do_cmd(pollfd& sock) {
 	Client& client = _clients[sock.fd];
-	std::string buffer = client.getBuffer();
-	std::vector<std::string> cmd_args;
-
-	buffer.erase(buffer.find_last_of("\r")); // \n ?
-
-	// split the buffer into cmd and args
-	const char* tmp = buffer.c_str();
-	while (tmp) {
-		while (*tmp == ' ') 
-			++tmp;
-		size_t pos = std::string(tmp).find(" ");
-		if (pos != std::string::npos) {
-			cmd_args.push_back(std::string(tmp).substr(0, pos));
-			tmp += pos;
-		}
-		else {
-			cmd_args.push_back(std::string(tmp));
-			tmp = NULL;
-		}
-	}
-	client.getBuffer().clear();
+	std::vector<std::string> cmd_args = splitClientBuffer(client);
 	//=====================
 
 	// for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
@@ -92,24 +78,8 @@ void Server::do_cmd(pollfd& sock) {
 	int code = getCommandCode(cmd_args[0]);
 	switch (code) {
 		case NICK:
-		{
-			// verify of characters are valid
-			std::string restrict(" ,*!@.$:#&");
-			if (cmd_args[1].find_first_of(restrict) != std::string::npos) {
-				//send proper error message
-				std::cout << "NICK: invalid characters" << std::endl;
-				break;
-			}
-			// ---
-			// verify if nick is already used
-			if (nickIsUsed(cmd_args[1])) {
-				// send error message
-				std::cout << "Nickname already used" << std::endl;
-			} else
-				client.setNickname(cmd_args[1]);
+			nickCmd(client, cmd_args);
 			break;
-
-		}
 		case USER:
 		{
 			bool foundRealName = false;
@@ -153,12 +123,12 @@ void Server::do_cmd(pollfd& sock) {
 		default:
 			break;
 	}
-	std::cout << "Client nickname: " << client.getNickname() << std::endl;
-	std::cout << "Client username: " << client.getUsername() << std::endl;
 
 	if (!client.isRegistered() && !client.getNickname().empty() && !client.getUsername().empty()) {
 		client.setRegistered(true);
 		std::cout << "Client registered" << std::endl;
+		std::cout << "Client nickname: " << client.getNickname() << std::endl;
+		std::cout << "Client username: " << client.getUsername() << std::endl;
 		if (sock.revents & POLLOUT)
 			sendMsgTo(client, RPL_WELCOME);
 		else {
@@ -169,6 +139,47 @@ void Server::do_cmd(pollfd& sock) {
 	cmd_args.clear();
 	std::cout << "--------------------------------------" << std::endl;
 }
+
+
+// ==========================================================================================
+
+int Server::sendMsgTo(const Client& client, const std::string& code) {
+	std::string msg = ":" + _srv_ip + " " + code + " " + client.getNickname() + " :"; // probably need to change that in future
+	if (code == RPL_WELCOME) {
+		msg += "Welcome to the IRC server " + client.getNickname() + "!" + "\r\n";
+		std::cout << msg << std::endl;
+		return send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+	return -1;
+}
+
+std::vector<std::string> Server::splitClientBuffer(Client& client) {
+	std::string buffer = client.getBuffer();
+	std::vector<std::string> cmd_args;
+
+	size_t pos = buffer.find_last_of("\r\n");
+	std::cout << "pos:" << pos << std::endl;
+	buffer.erase(pos -1, 2); // \n ? // probably need to change that in future
+
+	// split the buffer into cmd and args
+	const char* tmp = buffer.c_str();
+	while (tmp) {
+		while (*tmp == ' ') 
+			++tmp;
+		size_t pos = std::string(tmp).find(" ");
+		if (pos != std::string::npos) {
+			cmd_args.push_back(std::string(tmp).substr(0, pos));
+			tmp += pos;
+		}
+		else {
+			cmd_args.push_back(std::string(tmp));
+			tmp = NULL;
+		}
+	}
+	client.getBuffer().clear();
+	return cmd_args;
+}
+
 
 int Server::createServerSocket(int port) {
 	// Creating socket file descriptor
@@ -266,7 +277,6 @@ int Server::recvMsgFrom(SocketIt socket) {
 	}
 	client.setBuffer(buffer);
 	std::string msg = client.getBuffer();
-	// std::cout << "msg: " << msg << std::endl;
 	if (msg.find("\r\n") == std::string::npos) {
 		std::cout << "msg not complete in:" << std::endl;
 		return 1;
