@@ -82,7 +82,6 @@ void Server::do_cmd(SOCKET sock) {
 		std::cout << "in cmd_args: " << *it << std::endl;
 	}
 	
-	int code = getCommandCode(cmd_args[0]);
 	std::cout << "COMMAND: " << buffer << "--------------------------------------"  <<std::endl;
 
 	std::transform(cmd_args[0].begin(), cmd_args[0].end(), cmd_args[0].begin(), ::tolower);
@@ -97,48 +96,7 @@ void Server::do_cmd(SOCKET sock) {
 	else {
 		std::cout << "Command not found" << std::endl;
 	}
-	/* switch (code)	{
-		case NICK:
-		{
-			// verify of characters are valid
-			std::string restrict(" ,*!@.$:#&");
-			if (cmd_args[1].find_first_of(restrict) != std::string::npos) {
-				//send proper error message
-				std::cout << "NICK: invalid characters" << std::endl;
-				break;
-			}
-			// ---
-			// verify if nick is already used
-			if (nickIsUsed(cmd_args[1])) {
-				// send error message
-				std::cout << "Nickname already used" << std::endl;
-			} else
-				client.setNickname(cmd_args[1]);
-			break;
 
-		}
-		case USER:
-			// verify of characters are valid
-			// ---
-			// verify if User already registered
-			if (client.isRegistered()) {
-				// send error message
-				std::cout << "User already registered" << std::endl;
-			}
-			// verify if User is already used
-			else if (userIsUsed(cmd_args[1])) {
-				// send error message
-				std::cout << "Username already used" << std::endl;
-			} else
-				client.setUsername(cmd_args[1]);
-			break;
-		case UNKNOWN:
-			// send error message
-			std::cout << "Unknown command" << std::endl;
-			break;
-		default:
-			break;
-	} */
 	std::cout << "Client nickname: " << client.getNickname() << std::endl;
 	std::cout << "Client username: " << client.getUsername() << std::endl;
 
