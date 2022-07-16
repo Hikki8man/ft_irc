@@ -3,6 +3,25 @@
 
 void UserCommand::execute(const Command& cmd, std::vector<std::string>& args, Client& sender)
 {
+	bool foundRealName = false;
+	for (std::vector<std::string>::iterator it = args.begin(); it != args.end(); ++it) {
+		if (it->find(":", 0, 1) != std::string::npos) {
+			foundRealName = true;
+			std::string realName = it->c_str() + 1;
+			++it;
+			while (it != args.end()) {
+				realName += " " + *it;
+				++it;
+			}
+			sender.setRealName(realName);
+			std::cout << "REALNAME: " << sender.getRealName() << std::endl;
+			break;
+		}
+	}
+	if (!foundRealName) {
+		//send ERR_NEEDMOREPARAMS
+		std::cout << "USER: no real name" << std::endl;
+	}
 	// verify of characters are valid
 	// ---
 	// verify if User already registered

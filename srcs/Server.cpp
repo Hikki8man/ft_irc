@@ -55,29 +55,8 @@ CommandCode Server::getCommandCode(const std::string& cmd) {
 }
 
 void Server::do_cmd(SOCKET sock) {
-	Client& client = _clients[sock];
-	std::string buffer = client.getBuffer();
-	buffer.erase(buffer.find_last_of("\r\n"));
-	std::vector<std::string> cmd_args;
-
-	// split the buffer into cmd and args
-	const char* tmp = buffer.c_str();
-	while (tmp) {
-		while (*tmp == ' ')
-			++tmp;
-		size_t pos = std::string(tmp).find(" ");
-		if (pos != std::string::npos) {
-			cmd_args.push_back(std::string(tmp).substr(0, pos));
-			std::cout << "tmp: " << tmp << std::endl;
-			tmp += pos;
-		}
-		else {
-			cmd_args.push_back(std::string(tmp));
-			tmp = NULL;
-		}
-	}
-	client.getBuffer().clear();
-	//=====================
+	Client& client = _clients[sock.fd];
+	std::vector<std::string> cmd_args = splitClientBuffer(client);
 
 	for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
 		std::cout << "in cmd_args: " << *it << std::endl;
@@ -97,64 +76,6 @@ void Server::do_cmd(SOCKET sock) {
 	else {
 		std::cout << "Command not found" << std::endl;
 	}
-
-	std::cout << "Client nickname: " << client.getNickname() << std::endl;
-	std::cout << "Client username: " << client.getUsername() << std::endl;
-
-/*void Server::do_cmd(pollfd& sock) {
-	Client& client = _clients[sock.fd];
-	std::vector<std::string> cmd_args = splitClientBuffer(client);
-
-	int code = getCommandCode(cmd_args[0]);
-	switch (code) {
-		case NICK:
-			nickCmd(client, cmd_args);
-			break;
-		case USER:
-		{
-			bool foundRealName = false;
-			for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
-				if (it->find(":", 0, 1) != std::string::npos) {
-					foundRealName = true;
-					std::string realName = it->c_str() + 1;
-					++it;
-					while (it != cmd_args.end()) {
-						realName += " " + *it;
-						++it;
-					}
-					client.setRealName(realName);
-					std::cout << "REALNAME: " << client.getRealName() << std::endl;
-					break;
-				}
-			}
-			if (!foundRealName) {
-				//send ERR_NEEDMOREPARAMS
-				std::cout << "USER: no real name" << std::endl;
-			}
-			// verify of characters are valid
-			// ---
-			// verify if User already registered
-			if (client.isRegistered()) {
-				// send error message
-				std::cout << "User already registered" << std::endl;
-			}
-			// verify if User is already used
-			else if (userIsUsed(cmd_args[1])) {
-				// send error message
-				std::cout << "Username already used" << std::endl;
-			} else
-				client.setUsername(cmd_args[1]);
-			break;
-		}
-		case JOIN:
-			joinCmd(client, cmd_args);
-		case UNKNOWN:
-			// send error message
-			std::cout << "Unknown command" << std::endl;
-			break;
-		default:
-			break;
-	}*/
 
 	if (!client.isRegistered() && !client.getNickname().empty() && !client.getUsername().empty()) {
 		client.setRegistered(true);
