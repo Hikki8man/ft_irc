@@ -66,15 +66,14 @@ void Server::nickCmd(Client& client, std::vector<std::string>& args) {
 				client.setNickname(args[1]);
 }
 
+void Server::joinCmd(Client& client, std::vector<std::string>& args) {
+	
+}
+
 void Server::do_cmd(pollfd& sock) {
 	Client& client = _clients[sock.fd];
 	std::vector<std::string> cmd_args = splitClientBuffer(client);
-	//=====================
 
-	// for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
-	// 	std::cout << "in cmd_args: " << *it << std::endl;
-	// }
-	
 	int code = getCommandCode(cmd_args[0]);
 	switch (code) {
 		case NICK:
@@ -116,6 +115,8 @@ void Server::do_cmd(pollfd& sock) {
 				client.setUsername(cmd_args[1]);
 			break;
 		}
+		case JOIN:
+			joinCmd(client, cmd_args);
 		case UNKNOWN:
 			// send error message
 			std::cout << "Unknown command" << std::endl;
@@ -154,15 +155,17 @@ int Server::sendMsgTo(const Client& client, const std::string& code) {
 }
 
 std::vector<std::string> Server::splitClientBuffer(Client& client) {
-	std::string buffer = client.getBuffer();
+	std::string& buffer = client.getBuffer();
 	std::vector<std::string> cmd_args;
 
-	size_t pos = buffer.find_last_of("\r\n");
-	std::cout << "pos:" << pos << std::endl;
-	buffer.erase(pos -1, 2); // \n ? // probably need to change that in future
+	size_t pos = buffer.find_first_of("\r\n");
+	std::string cmd = buffer.substr(0, pos);
+	std::cout << "cmd:" << cmd << std::endl;
+	buffer.erase(0, pos + 2); // \n ? // probably need to change that in future
+	std::cout << "buffer:" << buffer << std::endl;
 
 	// split the buffer into cmd and args
-	const char* tmp = buffer.c_str();
+	const char* tmp = cmd.c_str();
 	while (tmp) {
 		while (*tmp == ' ') 
 			++tmp;
@@ -176,7 +179,6 @@ std::vector<std::string> Server::splitClientBuffer(Client& client) {
 			tmp = NULL;
 		}
 	}
-	client.getBuffer().clear();
 	return cmd_args;
 }
 

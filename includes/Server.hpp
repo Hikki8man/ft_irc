@@ -2,6 +2,7 @@
 #define SERVER_HPP
 
 #include "Client.hpp"
+#include "Channel.hpp"
 #include "NumericRepliesCode.hpp"
 #include "CommandCode.hpp"
 
@@ -39,6 +40,7 @@ class Server {
 		enum CommandCode getCommandCode(const std::string&);
 		void do_cmd(pollfd&);
 		void nickCmd(Client&, std::vector<std::string>&);
+		void joinCmd(Client&, std::vector<std::string>&);
 
 		std::vector<std::string> splitClientBuffer(Client& client);
 
@@ -57,7 +59,7 @@ class Server {
 		std::map<SOCKET, Client> _clients;
 
 		// list of channels
-		// std::vector<Channel> _channels;
+		std::vector<Channel> _channels;
 
 };
 
