@@ -8,13 +8,14 @@ NAME		=	ircserv
 #             VPATH             #
 #===============================#
 
-VPATH		=	srcs:includes
+VPATH		=	srcs:includes:srcs/commands:srcs/commands/impl:includes/commands:includes/commands/impl
 
 #===============================#
 #             DIRS              #
 #===============================#
 
 OBJS_DIR	=	objs
+INCS_DIR	=  	includes
 LIBFT_DIR	=	./libft/
 RL_DIR		=	/Users/$$USER/.brew/opt/readline/lib
 RL_DIR_I	=	/Users/$$USER/.brew/opt/readline/include
@@ -27,11 +28,25 @@ RL_DIR_I	=	/Users/$$USER/.brew/opt/readline/include
 
 SRCS		= 	main.cpp
 
+#             CORE              #
+
+SRCS		+=	Server.cpp \
+				Client.cpp \
+				Irc.cpp
+
+#             CMDS              #
+
+SRCS 		+=	Command.cpp \
+				CommandManager.cpp \
+				NickCommand.cpp \
+				UserCommand.cpp
+
 #===============================#
 #            HEADERS            #
 #===============================#
 
-HEADERS		=	ft_irc.hpp
+HEADERS		=	Irc.hpp \
+				CommandExecutor.cpp
 
 #===============================#
 #            OBJECTS            #
@@ -56,7 +71,7 @@ RM			=	rm -f
 #===============================#
 
 CC			=	c++
-CFLAGS		=	-Wall -Wextra -Werror -std=c++98
+CFLAGS		=	#-Wall -Wextra -Werror -std=c++98
 
 #===============================#
 #             COLORS            #
@@ -96,7 +111,7 @@ fclean: clean
 
 ${OBJS_DIR}/%.o: %.cpp ${MAKEFILE} #${HEADERS}
 	@mkdir -p ${OBJS_DIR}
-	@${CC} ${CFLAGS} -c $< -o $@ -I ${INCS_DIR}
+	@${CC} ${CFLAGS} -c $< -o $@ -I${INCS_DIR}
 	@echo "[${NAME}] Compiling ${YELLOW}$<${WHITE}"
 
 ${NAME}: ${OBJS} ${LIBFT_SRCS}

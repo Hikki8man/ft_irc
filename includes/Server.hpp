@@ -28,9 +28,12 @@ class Server {
 
 		int run(int port);
 
+
+		bool nickIsUsed(const std::string&);
+		bool userIsUsed(const std::string&);
+		Server& operator=(const Server&);
 	private:
 		Server(const Server&);
-		Server& operator=(const Server&);
 
 		int createServerSocket(int port);
 		int newConnection();
@@ -43,9 +46,6 @@ class Server {
 		void joinCmd(Client&, std::vector<std::string>&);
 
 		std::vector<std::string> splitClientBuffer(Client& client);
-
-		bool nickIsUsed(const std::string&);
-		bool userIsUsed(const std::string&);
 
 		// Server socket && address
 		SOCKET _srv_fd;

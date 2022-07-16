@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "../includes/Server.hpp"
+#include "Irc.hpp"
 
 int main(int ac, char **av) {
 	if (ac < 2 || ac > 3) {
@@ -20,7 +21,13 @@ int main(int ac, char **av) {
 	
 	std::cout << "port: " << port << std::endl;
 
+	Irc irc;
+
 	Server server;
+	CommandManager commandManager;
+
+	irc.setServer(server);
+	irc.setCommandManager(commandManager);
 
 	if (server.run(port) == EXIT_FAILURE) {
 		std::cerr << "Error while running server" << std::endl;

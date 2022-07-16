@@ -1,4 +1,8 @@
 #include "../includes/Server.hpp"
+#include "Irc.hpp"
+#include "commands/CommandExecutor.hpp"
+#include <algorithm>
+#include <iostream>
 
 Server::Server() {}
 
@@ -50,27 +54,54 @@ CommandCode Server::getCommandCode(const std::string& cmd) {
 	}
 }
 
-void Server::nickCmd(Client& client, std::vector<std::string>& args) {
-	// verify of characters are valid
-			if (args[1].find_first_of(RESTRICTED_CHARACTERS) != std::string::npos) {
-				//send proper error message
-				std::cout << "NICK: invalid characters" << std::endl;
-				return;
-			}
-			// ---
-			// verify if nick is already used
-			if (nickIsUsed(args[1])) {
-				// send error message
-				std::cout << "Nickname already used" << std::endl;
-			} else
-				client.setNickname(args[1]);
-}
+void Server::do_cmd(SOCKET sock) {
+	Client& client = _clients[sock];
+	std::string buffer = client.getBuffer();
+	buffer.erase(buffer.find_last_of("\r\n"));
+	std::vector<std::string> cmd_args;
 
-void Server::joinCmd(Client& client, std::vector<std::string>& args) {
+	// split the buffer into cmd and args
+	const char* tmp = buffer.c_str();
+	while (tmp) {
+		while (*tmp == ' ')
+			++tmp;
+		size_t pos = std::string(tmp).find(" ");
+		if (pos != std::string::npos) {
+			cmd_args.push_back(std::string(tmp).substr(0, pos));
+			std::cout << "tmp: " << tmp << std::endl;
+			tmp += pos;
+		}
+		else {
+			cmd_args.push_back(std::string(tmp));
+			tmp = NULL;
+		}
+	}
+	client.getBuffer().clear();
+	//=====================
+
+	for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
+		std::cout << "in cmd_args: " << *it << std::endl;
+	}
 	
-}
+	std::cout << "COMMAND: " << buffer << "--------------------------------------"  <<std::endl;
 
-void Server::do_cmd(pollfd& sock) {
+	std::transform(cmd_args[0].begin(), cmd_args[0].end(), cmd_args[0].begin(), ::tolower);
+
+	Command cmd(cmd_args[0], cmd_args, client);
+
+	CommandExecutor *executor = Irc::getInstance().getCommandManager().getCommand(cmd_args[0]);
+
+	if (executor) {
+		executor->execute(cmd, cmd_args, client);
+	}
+	else {
+		std::cout << "Command not found" << std::endl;
+	}
+
+	std::cout << "Client nickname: " << client.getNickname() << std::endl;
+	std::cout << "Client username: " << client.getUsername() << std::endl;
+
+/*void Server::do_cmd(pollfd& sock) {
 	Client& client = _clients[sock.fd];
 	std::vector<std::string> cmd_args = splitClientBuffer(client);
 
@@ -123,7 +154,7 @@ void Server::do_cmd(pollfd& sock) {
 			break;
 		default:
 			break;
-	}
+	}*/
 
 	if (!client.isRegistered() && !client.getNickname().empty() && !client.getUsername().empty()) {
 		client.setRegistered(true);
