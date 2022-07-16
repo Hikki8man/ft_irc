@@ -1,5 +1,8 @@
 #include "../includes/Server.hpp"
-
+#include "Irc.hpp"
+#include "commands/CommandExecutor.hpp"
+#include <algorithm>
+#include <iostream>
 
 
 Server::Server() {}
@@ -81,7 +84,20 @@ void Server::do_cmd(SOCKET sock) {
 	
 	int code = getCommandCode(cmd_args[0]);
 	std::cout << "COMMAND: " << buffer << "--------------------------------------"  <<std::endl;
-	switch (code)	{
+
+	std::transform(cmd_args[0].begin(), cmd_args[0].end(), cmd_args[0].begin(), ::tolower);
+
+	Command cmd(cmd_args[0], cmd_args, client);
+
+	CommandExecutor *executor = Irc::getInstance().getCommandManager().getCommand(cmd_args[0]);
+
+	if (executor) {
+		executor->execute(cmd, cmd_args, client);
+	}
+	else {
+		std::cout << "Command not found" << std::endl;
+	}
+	/* switch (code)	{
 		case NICK:
 		{
 			// verify of characters are valid
@@ -122,7 +138,7 @@ void Server::do_cmd(SOCKET sock) {
 			break;
 		default:
 			break;
-	}
+	} */
 	std::cout << "Client nickname: " << client.getNickname() << std::endl;
 	std::cout << "Client username: " << client.getUsername() << std::endl;
 
@@ -232,7 +248,7 @@ int Server::recvMsgFrom(SocketIt socket) {
 	std::string msg = client.getBuffer();
 	// std::cout << "msg: " << msg << std::endl;
 	if (msg.find("\r\n", msg.length() - 2) == std::string::npos) {
-		std::cout << "msg not complete in:" << std::endl;
+		std::cout << "msg not complete in: " << msg << std::endl;
 		return 0;
 	}
 	else {
