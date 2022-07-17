@@ -3,8 +3,8 @@
 
 #include "Client.hpp"
 #include "Channel.hpp"
-#include "NumericRepliesCode.hpp"
-#include "CommandCode.hpp"
+#include "ReplyCode.hpp"
+#include "ErrReplyCode.hpp"
 
 #include "sys/socket.h"
 #include <poll.h>
