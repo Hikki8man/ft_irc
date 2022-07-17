@@ -55,7 +55,7 @@ CommandExecutor *Command::parse(std::string& buffer) {
 			args.push_back(std::string(tmp).substr(0, pos));
 			tmp += pos;
 		}
-		else {
+		else if (*tmp) {
 			args.push_back(std::string(tmp));
 			tmp = NULL;
 		}
