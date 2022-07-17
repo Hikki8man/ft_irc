@@ -12,7 +12,7 @@ class Irc
 	private:
 		static Irc 		*instance;
 		Server 			*server;
-		CommandManager	commandManager;
+		CommandManager	*commandManager;
 	public:
 		static Irc& getInstance();
 
@@ -21,8 +21,8 @@ class Irc
 		Server*		getServer();
 		void	 	setServer(Server* server);
 
-		CommandManager& 	getCommandManager();
-		void				setCommandManager(CommandManager& commandManager);
+		CommandManager* 	getCommandManager();
+		void				setCommandManager(CommandManager* commandManager);
 };
 
 

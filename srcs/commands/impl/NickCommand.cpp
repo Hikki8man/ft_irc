@@ -1,11 +1,12 @@
 #include "commands/impl/NickCommand.hpp"
 #include "Irc.hpp"
 
-void NickCommand::execute(const Command& cmd, std::vector<std::string>& args, Client& sender)
+void NickCommand::execute(const Command& cmd, Client& sender)
 {
+	const std::vector<std::string>& args = cmd.getArgs();
 	// verify of characters are valid
 	std::string restrict(" ,*!@.$:#&");
-	if (args[1].find_first_of(restrict) != std::string::npos) {
+	if (args[0].find_first_of(restrict) != std::string::npos) {
 		//send proper error message
 		std::cout << "NICK: invalid characters" << std::endl;
 		return;
@@ -16,5 +17,5 @@ void NickCommand::execute(const Command& cmd, std::vector<std::string>& args, Cl
 		// send error message
 		std::cout << "Nickname already used" << std::endl;
 	} else
-		sender.setNickname(args[1]);
+		sender.setNickname(args[0]);
 }

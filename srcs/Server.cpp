@@ -1,7 +1,6 @@
 #include "../includes/Server.hpp"
 #include "Irc.hpp"
 #include "commands/CommandExecutor.hpp"
-#include <algorithm>
 #include <iostream>
 
 Server::Server() {}
@@ -39,40 +38,33 @@ std::vector<pollfd>& Server::getPollfds() {
 
 void Server::do_cmd(pollfd& sock) {
 	Client& client = _clients[sock.fd];
-	std::vector<std::string> cmd_args = splitClientBuffer(client);
 
-	for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
-		std::cout << "in cmd_args: " << *it << std::endl;
-	}
-	
+	while (client.getBuffer().find("\r\n") != std::string::npos) {
 
-	std::transform(cmd_args[0].begin(), cmd_args[0].end(), cmd_args[0].begin(), ::tolower);
+		Command cmd(client);
+		CommandExecutor *executor = cmd.parse(client.getBuffer());
 
-	Command cmd(cmd_args[0], cmd_args, client);
-
-	CommandExecutor *executor = Irc::getInstance().getCommandManager().getCommand(cmd_args[0]);
-
-	if (executor) {
-		executor->execute(cmd, cmd_args, client);
-	}
-	else {
-		std::cout << "Command not found" << std::endl;
-	}
-
-	if (!client.isRegistered() && !client.getNickname().empty() && !client.getUsername().empty()) {
-		client.setRegistered(true);
-		std::cout << "Client registered" << std::endl;
-		std::cout << "Client nickname: " << client.getNickname() << std::endl;
-		std::cout << "Client username: " << client.getUsername() << std::endl;
-		if (sock.revents & POLLOUT)
-			sendMsgTo(client, RPL_WELCOME);
-		else {
-			std::cout << "Client not ready" << std::endl;
+		if (executor) {
+			executor->execute(cmd, client);
 		}
-		//send welcome message + check pollout
+		else {
+			std::cout << "Command not found" << std::endl;
+		}
+
+		if (!client.isRegistered() && !client.getNickname().empty() && !client.getUsername().empty()) {
+			client.setRegistered(true);
+			std::cout << "Client registered" << std::endl;
+			std::cout << "Client nickname: " << client.getNickname() << std::endl;
+			std::cout << "Client username: " << client.getUsername() << std::endl;
+			if (sock.revents & POLLOUT)
+				sendMsgTo(client, RPL_WELCOME);
+			else {
+				std::cout << "Client not ready" << std::endl;
+			}
+			//send welcome message + check pollout
+		}
+		std::cout << "--------------------------------------" << std::endl;
 	}
-	cmd_args.clear();
-	std::cout << "--------------------------------------" << std::endl;
 }
 
 

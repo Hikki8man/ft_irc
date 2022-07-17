@@ -4,6 +4,8 @@
 #include "CommandExecutor.hpp"
 #include <map>
 
+class CommandExecutor;
+
 class CommandManager
 {
 	private:

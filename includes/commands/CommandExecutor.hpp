@@ -10,7 +10,7 @@ class Command;
 class CommandExecutor
 {
 	public:
-		virtual void execute(const Command& cmd, std::vector<std::string>& args, Client& sender) = 0;
+		virtual void execute(const Command& cmd, Client& sender) = 0;
 
 		virtual ~CommandExecutor() {}
 };

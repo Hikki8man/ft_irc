@@ -4,5 +4,6 @@
 #include <cstring>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #endif // COMMON_HPP

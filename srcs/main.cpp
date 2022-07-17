@@ -27,7 +27,7 @@ int main(int ac, char **av) {
 	CommandManager commandManager;
 
 	irc.setServer(&server);
-	irc.setCommandManager(commandManager);
+	irc.setCommandManager(&commandManager);
 
 	if (server.run(port) == EXIT_FAILURE) {
 		std::cerr << "Error while running server" << std::endl;
