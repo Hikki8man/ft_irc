@@ -30,7 +30,7 @@ void UserCommand::execute(const Command& cmd, std::vector<std::string>& args, Cl
 		std::cout << "User already registered" << std::endl;
 	}
 	// verify if User is already used
-	else if (Irc::getInstance().getServer().userIsUsed(args[1])) {
+	else if (Irc::getInstance().getServer()->userIsUsed(args[1])) {
 		// send error message
 		std::cout << "Username already used" << std::endl;
 	} else

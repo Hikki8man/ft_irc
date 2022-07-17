@@ -30,29 +30,12 @@ bool Server::userIsUsed(const std::string& user) {
 	return false;
 }
 
-// COMMAND HANDLER===========================================================================
+// Getter ===========================================================================
 
-CommandCode Server::getCommandCode(const std::string& cmd) {
-	if (cmd == "NICK") {
-		return NICK;
-	} else if (cmd == "USER") {
-		return USER;
-	} else if (cmd == "JOIN") {
-		return JOIN;
-	} else if (cmd == "PART") {
-		return PART;
-	} else if (cmd == "QUIT") {
-		return QUIT;
-	} else if (cmd == "PRIVMSG") {
-		return PRIVMSG;
-	} else if (cmd == "PING") {
-		return PING;
-	} else if (cmd == "PONG") {
-		return PONG;
-	} else {
-		return UNKNOWN;
-	}
+std::vector<pollfd>& Server::getPollfds() {
+	return _sockets;
 }
+
 
 void Server::do_cmd(pollfd& sock) {
 	Client& client = _clients[sock.fd];

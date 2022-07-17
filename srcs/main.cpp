@@ -26,7 +26,7 @@ int main(int ac, char **av) {
 	Server server;
 	CommandManager commandManager;
 
-	irc.setServer(server);
+	irc.setServer(&server);
 	irc.setCommandManager(commandManager);
 
 	if (server.run(port) == EXIT_FAILURE) {

@@ -21,6 +21,9 @@
 
 #define RESTRICTED_CHARACTERS " ,*!@.$:#&"
 
+class Client;
+class Channel;
+
 class Server {
 	public:
 		Server();
@@ -31,6 +34,7 @@ class Server {
 
 		bool nickIsUsed(const std::string&);
 		bool userIsUsed(const std::string&);
+		std::vector<pollfd>& getPollfds();
 		Server& operator=(const Server&);
 	private:
 		Server(const Server&);

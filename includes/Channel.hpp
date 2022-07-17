@@ -5,6 +5,8 @@
 #include <iostream>
 #include "Client.hpp"
 
+class Client;
+
 class Channel {
 	public:
 		Channel();
@@ -31,7 +33,7 @@ class Channel {
 		
 	private:
 		std::string _name, _key;
-		std::map<SOCKET, ClientAndMod> _clients;
+		std::map<int, ClientAndMod> _clients;
 };
 
 #endif

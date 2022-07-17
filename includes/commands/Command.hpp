@@ -4,6 +4,8 @@
 #include "../Client.hpp"
 #include "../common.hpp"
 
+class Client;
+
 class Command {
 
 	private:

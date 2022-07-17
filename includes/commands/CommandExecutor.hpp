@@ -5,6 +5,8 @@
 #include "../common.hpp"
 #include "Command.hpp"
 
+class Command;
+
 class CommandExecutor
 {
 	public:

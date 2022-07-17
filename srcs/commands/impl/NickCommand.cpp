@@ -12,7 +12,7 @@ void NickCommand::execute(const Command& cmd, std::vector<std::string>& args, Cl
 	}
 	// ---
 	// verify if nick is already used
-	if (Irc::getInstance().getServer().nickIsUsed(args[1])) {
+	if (Irc::getInstance().getServer()->nickIsUsed(args[1])) {
 		// send error message
 		std::cout << "Nickname already used" << std::endl;
 	} else

@@ -48,5 +48,6 @@ void Channel::addClient(const Client& client) {
 		_clients.insert(std::make_pair(client.getSocket(), ClientAndMod(client, '@')));
 	else
 		_clients.insert(std::make_pair(client.getSocket(), ClientAndMod(client, '\0')));
-	
+	// send join message to client
+	// send NAMES && end of NAMES message to client
 }

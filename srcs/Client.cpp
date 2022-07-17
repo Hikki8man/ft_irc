@@ -44,14 +44,18 @@ const std::string Client::getRealName() const {
 	return _realName;
 }
 
-const pollfd* Client::getPollfd() const {
-	return _pollfd;
+const pollfd& Client::getPollfd() const {
+	SocketIt it = Irc::getInstance().getServer()->getPollfds().begin();
+	for (; it != Irc::getInstance().getServer()->getPollfds().end(); it++) {
+		if (it->fd == _socket)
+			return *it;
+	}
+	return *it;
 }
 
 std::string& Client::getBuffer() {
 	return _bufferStocked;
 }
-
 
 
 // SETTERS
@@ -73,10 +77,6 @@ void Client::setBuffer(const std::string& buffer) {
 
 void Client::setRegistered(bool registered) {
 	_registered = registered;
-}
-
-void Client::setPollfd(const pollfd& pollfd) {
-	_pollfd = &pollfd;
 }
 
 bool Client::isRegistered() const {

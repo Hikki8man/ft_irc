@@ -8,11 +8,11 @@ Irc::Irc() {
 	Irc::instance = this;
 }
 
-Server& Irc::getServer() {
+Server* Irc::getServer() {
 	return server;
 }
 
-void Irc::setServer(Server& server) {
+void Irc::setServer(Server* server) {
 	this->server = server;
 }
 
