@@ -34,6 +34,8 @@ SRCS		+=	Server.cpp \
 				Client.cpp \
 				Channel.cpp \
 				utils.cpp \
+				Reply.cpp \
+				ErrReply.cpp \
 				Irc.cpp
 
 #             CMDS              #

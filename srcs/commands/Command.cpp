@@ -31,33 +31,37 @@ CommandExecutor *Command::parse(std::string& buffer) {
 		_name = cmd.substr(0, pos);
 		cmd.erase(0, pos);
 	}
-	else
+	else {
 		_name = cmd;
+		cmd.clear();
+	}
 	std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
 	CommandExecutor *executor = Irc::getInstance().getCommandManager()->getCommand(_name);
 	// if cmd doesn't exist, stop parsing and return NULL
 	if (!executor)
 		return NULL;
+	
 	// if cmd exists, parse the args
 	std::vector<std::string> args;
-	const char* tmp = cmd.c_str();
-	while (tmp) {
-		while (*tmp == ' ') 
-			++tmp;
-		if (*tmp == ':') {
-			++tmp;
+	while (!cmd.empty()) {
+		std::cout << "in loop" << std::endl;
+		pos = cmd.find_first_not_of(' ');
+		if (pos != std::string::npos)
+			cmd.erase(0, pos);
+		if (cmd.at(0) == ':') {
+			cmd.erase(0, 1);
 			// later do case with the : at the end of the arg
-			args.push_back(std::string(tmp));
+			args.push_back(cmd);
 			break;
 		}
-		size_t pos = std::string(tmp).find(" ");
+		pos = cmd.find(" ");
 		if (pos != std::string::npos) {
-			args.push_back(std::string(tmp).substr(0, pos));
-			tmp += pos;
+			args.push_back(cmd.substr(0, pos));
+			cmd.erase(0, pos);
 		}
-		else if (*tmp) {
-			args.push_back(std::string(tmp));
-			tmp = NULL;
+		else {
+			args.push_back(cmd);
+			cmd.clear();
 		}
 	}
 	_args = args;

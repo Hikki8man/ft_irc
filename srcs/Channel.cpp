@@ -44,8 +44,8 @@ void Channel::setKey(const std::string& key) {
 }
 
 void Channel::addClient(const Client& client, const std::string& key) {
+	// Check if the client is already in the channel
 	if (_clients.find(client.getSocket()) != _clients.end()) {
-		// client already in channel
 		return;
 	}
 	else if (!key.empty() && _key != key) {

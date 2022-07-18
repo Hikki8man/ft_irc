@@ -3,8 +3,6 @@
 
 #include "Client.hpp"
 #include "Channel.hpp"
-#include "ReplyCode.hpp"
-#include "ErrReplyCode.hpp"
 
 #include "sys/socket.h"
 #include <poll.h>
@@ -44,7 +42,9 @@ class Server {
 		void send_rpl_endofnames(const Client&, const Channel&);
 
 		// Send Error Reply to client
-		
+		void send_err_nosuchchannel(const Client&, const std::string&);
+		void send_err_needmoreparams(const Client&, const std::string&);
+
 
 		std::map<std::string, Channel>& getChannels();
 		std::vector<pollfd>& getPollfds();

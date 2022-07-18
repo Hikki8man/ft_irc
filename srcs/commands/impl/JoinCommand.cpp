@@ -3,9 +3,9 @@
 void JoinCommand::execute(const Command& cmd, Client& sender)
 {
 	const std::vector<std::string>& args = cmd.getArgs();
-	
+
 	if (args.empty()) {
-		// send ERR_NEEDMOREPARAMS
+		Irc::getInstance().getServer()->send_err_needmoreparams(sender, "JOIN");
 		return; 
 	}
 
@@ -18,11 +18,9 @@ void JoinCommand::execute(const Command& cmd, Client& sender)
 	std::vector<std::string> channelsList = split(channels, ",");
 	std::vector<std::string> keysList = split(keys, ",");
 	
-	std::cout << "channels: " << channels << std::endl;
 	for (std::vector<std::string>::iterator it = channelsList.begin(); it != channelsList.end(); ++it) {
 		if ((*it->begin() != '#' && *it->begin() != '&') || (it->find(' ') != std::string::npos || it->find(',') != std::string::npos || it->find('\a') != std::string::npos)) {
-			// send ERR_NOSUCHCHANNEL ou autre jsp
-			std::cout << "Join: invalid channel" << std::endl;
+			Irc::getInstance().getServer()->send_err_nosuchchannel(sender, *it);
 			continue;
 		}
 		std::map<std::string, Channel>::iterator channel = Irc::getInstance().getServer()->getChannels().find(*it);

@@ -18,4 +18,6 @@ void NickCommand::execute(const Command& cmd, Client& sender)
 		std::cout << "Nickname already used" << std::endl;
 	} else
 		sender.setNickname(args[0]);
+	
+	sender.setPrefix();
 }
