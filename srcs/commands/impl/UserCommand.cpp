@@ -4,7 +4,6 @@
 void UserCommand::execute(const Command& cmd, Client& sender)
 {
 	const std::vector<std::string>& args = cmd.getArgs();
-	bool foundRealName = false;
 
 	sender.setRealName(args[args.size() - 1]); // todo: redo
 	// for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it) {

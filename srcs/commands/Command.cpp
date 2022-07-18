@@ -51,7 +51,7 @@ CommandExecutor *Command::parse(std::string& buffer) {
 			break;
 		if (cmd.at(0) == ':') {
 			cmd.erase(0, 1);
-			// later do case with the : at the end of the arg
+			// later do case with the : at the end of the arg ou pas
 			args.push_back(cmd);
 			break;
 		}

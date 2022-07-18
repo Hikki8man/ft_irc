@@ -161,6 +161,7 @@ int Server::recvMsgFrom(SocketIt socket) {
 		return 1;
 	}
 	if (n == 0) {
+		// need to remove client from clients list of channels
 		std::cout << sender.getNickname() << " disconnected" << std::endl;
 		_clients.erase(socket->fd);
 		_sockets.erase(socket);
