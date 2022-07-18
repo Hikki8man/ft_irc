@@ -64,3 +64,11 @@ void Server::send_err_alreadyregistered(const Client& client) {
 		send(client.getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
+
+// ========== ERR_BADCHANNELKEY (475) ==========
+void Server::send_err_badchannelkey(const Client& client, const std::string& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 475 " + client.getNickname() + " " + channel + " :Cannot join channel (+k)" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}

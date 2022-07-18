@@ -49,6 +49,7 @@ class Server {
 		void send_err_nicknameinuse(const Client&, const std::string&);
 		void send_err_nosuchchannel(const Client&, const std::string&);
 		void send_err_notonchannel(const Client&, const std::string&);
+		void send_err_badchannelkey(const Client&, const std::string&);
 		void send_err_needmoreparams(const Client&, const std::string&);
 		void send_err_alreadyregistered(const Client&);
 

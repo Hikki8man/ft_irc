@@ -29,14 +29,14 @@ void JoinCommand::execute(const Command& cmd, Client& sender)
 			Channel& newChannel = Irc::getInstance().getServer()->getChannels().insert(std::make_pair(*it, Channel(*it))).first->second;
 			newChannel.addClient(sender);
 			if (!keysList.empty()) {
-				newChannel.setKey(keysList[0]);
+				newChannel.setKey(keysList.front());
 				keysList.erase(keysList.begin());
 			}
 		}
 		else {
 			// add client to channel
 			if (!keysList.empty()) {
-				channel->second.addClient(sender, keysList[0]);
+				channel->second.addClient(sender, keysList.front());
 				keysList.erase(keysList.begin());
 			}
 			else {

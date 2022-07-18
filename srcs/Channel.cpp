@@ -48,9 +48,8 @@ void Channel::addClient(const Client& client, const std::string& key) {
 	if (_clients.find(client.getSocket()) != _clients.end()) {
 		return;
 	}
-	else if (!key.empty() && _key != key) {
-		// wrong key
-		// send ERR_BADCHANNELKEY
+	else if (_key != key) {
+		Irc::getInstance().getServer()->send_err_badchannelkey(client, _name);
 		return;
 	}
 	if (_clients.empty())
