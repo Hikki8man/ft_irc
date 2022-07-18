@@ -42,6 +42,9 @@ class Server {
 		void send_rpl_endofnames(const Client&, const Channel&);
 
 		// Send Error Reply to client
+		void send_err_nonicknamegiven(const Client&);
+		void send_err_erroneusnickname(const Client&, const std::string&);
+		void send_err_nicknameinuse(const Client&, const std::string&);
 		void send_err_nosuchchannel(const Client&, const std::string&);
 		void send_err_needmoreparams(const Client&, const std::string&);
 

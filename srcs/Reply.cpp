@@ -37,6 +37,7 @@ void  Server::send_rpl_namreply(const Client& client, const Channel& chan) {
 		}
 		clients_names.erase(clients_names.size() - 1);
 		int ret;
+		// Parse the message and making sure it's not too long
 		while (!clients_names.empty()) {
 			std::string msg = prefix;
 			if (clients_names.size() + msg.length() > BUFFER_MAX + 2) {
