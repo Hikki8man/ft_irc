@@ -33,6 +33,7 @@ SRCS		= 	main.cpp
 SRCS		+=	Server.cpp \
 				Client.cpp \
 				Channel.cpp \
+				utils.cpp \
 				Irc.cpp
 
 #             CMDS              #
@@ -40,7 +41,8 @@ SRCS		+=	Server.cpp \
 SRCS 		+=	Command.cpp \
 				CommandManager.cpp \
 				NickCommand.cpp \
-				UserCommand.cpp
+				UserCommand.cpp \
+				JoinCommand.cpp \
 
 #===============================#
 #            HEADERS            #

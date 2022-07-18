@@ -2,11 +2,13 @@
 
 #include "commands/impl/NickCommand.hpp"
 #include "commands/impl/UserCommand.hpp"
+#include "commands/impl/JoinCommand.hpp"
 
 CommandManager::CommandManager()
 {
 	addCommand("nick", new NickCommand());
 	addCommand("user", new UserCommand());
+	addCommand("join", new JoinCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)

@@ -21,7 +21,7 @@ class Channel {
 		const std::string getName() const;
 		const std::string getKey() const;
 		
-		void addClient(const Client&);
+		void addClient(const Client&, const std::string& key = "");
 		void removeClient(const Client&);
 
 		struct ClientAndMod {

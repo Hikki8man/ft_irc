@@ -21,6 +21,7 @@
 
 #define RESTRICTED_CHARACTERS " ,*!@.$:#&"
 #define CRLF "\r\n"
+#define BUFFER_MAX 512
 
 class Client;
 class Channel;
@@ -29,30 +30,33 @@ class Server {
 	public:
 		Server();
 		~Server();
+		Server& operator=(const Server&);
 
 		int run(int port);
 
-
 		bool nickIsUsed(const std::string&);
 		bool userIsUsed(const std::string&);
+
+		std::map<std::string, Channel>& getChannels();
 		std::vector<pollfd>& getPollfds();
-		Server& operator=(const Server&);
+		const std::string getPrefix() const;
 	private:
 		Server(const Server&);
 
 		int createServerSocket(int port);
+		void setPrefix();
 		int newConnection();
 		int recvMsgFrom(SocketIt);
-		int sendMsgTo(const Client&, const std::string&);
+		int sendMsgTo(const Client&, const int&);
 
 		void do_cmd(Client&);
 
-		std::vector<std::string> splitClientBuffer(Client& client);
 
 		// Server socket && address
 		SOCKET _srv_fd;
 		struct sockaddr_in _srv_addr;
 		std::string _srv_ip;
+		std::string _prefix;
 
 		// list of server and clients socket to poll 
 		std::vector<pollfd> _sockets;
@@ -61,7 +65,7 @@ class Server {
 		std::map<SOCKET, Client> _clients;
 
 		// list of channels
-		std::vector<Channel> _channels;
+		std::map<std::string, Channel> _channels;
 
 };
 

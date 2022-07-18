@@ -57,6 +57,10 @@ std::string& Client::getBuffer() {
 	return _bufferStocked;
 }
 
+const std::string Client::getPrefix() const {
+	return _prefix;
+}
+
 
 // SETTERS
 void Client::setNickname(const std::string& nick) {
@@ -78,6 +82,11 @@ void Client::setBuffer(const std::string& buffer) {
 void Client::setRegistered(bool registered) {
 	_registered = registered;
 }
+
+void Client::setPrefix() {
+	_prefix = ":" + _nick + "!" + _user + "@" + inet_ntoa(_addr.sin_addr);
+}
+
 
 bool Client::isRegistered() const {
 	return _registered;

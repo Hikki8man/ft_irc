@@ -6,4 +6,6 @@
 #include <vector>
 #include <algorithm>
 
+std::vector<std::string> split(const std::string& s, const std::string& delim);
+
 #endif // COMMON_HPP

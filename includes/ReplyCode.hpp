@@ -1,6 +1,6 @@
 #ifndef REPLYCODE_HPP
 #define REPLYCODE_HPP
 
-#define RPL_WELCOME "001"
+#define RPL_WELCOME 1
 
 #endif
