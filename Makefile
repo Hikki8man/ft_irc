@@ -32,6 +32,7 @@ SRCS		= 	main.cpp
 
 SRCS		+=	Server.cpp \
 				Client.cpp \
+				Channel.cpp \
 				Irc.cpp
 
 #             CMDS              #
@@ -46,7 +47,7 @@ SRCS 		+=	Command.cpp \
 #===============================#
 
 HEADERS		=	Irc.hpp \
-				CommandExecutor.cpp
+				CommandExecutor.hpp
 
 #===============================#
 #            OBJECTS            #
@@ -71,7 +72,7 @@ RM			=	rm -f
 #===============================#
 
 CC			=	c++
-CFLAGS		=	#-Wall -Wextra -Werror -std=c++98
+CFLAGS		=	-g3#-Wall -Wextra -Werror -std=c++98
 
 #===============================#
 #             COLORS            #

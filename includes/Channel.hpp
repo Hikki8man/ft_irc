@@ -5,6 +5,8 @@
 #include <iostream>
 #include "Client.hpp"
 
+class Client;
+
 class Channel {
 	public:
 		Channel();
@@ -21,10 +23,17 @@ class Channel {
 		
 		void addClient(const Client&);
 		void removeClient(const Client&);
+
+		struct ClientAndMod {
+			ClientAndMod(const Client&, char);
+
+			const Client &client;
+			char mod;
+		};
 		
 	private:
 		std::string _name, _key;
-		std::map<SOCKET, Client&> _clients;
+		std::map<int, ClientAndMod> _clients;
 };
 
 #endif

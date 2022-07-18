@@ -3,6 +3,10 @@
 
 #include <netinet/in.h>
 #include <iostream>
+#include <poll.h>
+#include <map>
+#include <vector>
+#include "Irc.hpp"
 
 #define SOCKET int
 
@@ -19,6 +23,7 @@ class Client {
 		const std::string getNickname() const;
 		const std::string getUsername() const;
 		const std::string getRealName() const;
+		const pollfd& getPollfd() const;
 		std::string& getBuffer();
 
 		void setNickname(const std::string& nick);

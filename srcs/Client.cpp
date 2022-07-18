@@ -23,6 +23,7 @@ Client& Client::operator=(const Client& other) {
 
 Client::~Client() {}
 
+// GETTERS
 int Client::getSocket() const {
 	return _socket;
 }
@@ -43,10 +44,21 @@ const std::string Client::getRealName() const {
 	return _realName;
 }
 
+const pollfd& Client::getPollfd() const {
+	SocketIt it = Irc::getInstance().getServer()->getPollfds().begin();
+	for (; it != Irc::getInstance().getServer()->getPollfds().end(); it++) {
+		if (it->fd == _socket)
+			return *it;
+	}
+	return *it;
+}
+
 std::string& Client::getBuffer() {
 	return _bufferStocked;
 }
 
+
+// SETTERS
 void Client::setNickname(const std::string& nick) {
 	_nick = nick;
 }

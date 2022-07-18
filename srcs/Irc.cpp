@@ -8,19 +8,19 @@ Irc::Irc() {
 	Irc::instance = this;
 }
 
-Server& Irc::getServer() {
+Server* Irc::getServer() {
 	return server;
 }
 
-void Irc::setServer(Server& server) {
+void Irc::setServer(Server* server) {
 	this->server = server;
 }
 
-CommandManager& Irc::getCommandManager() {
+CommandManager* Irc::getCommandManager() {
 	return commandManager;
 }
 
-void Irc::setCommandManager(CommandManager& commandManager) {
+void Irc::setCommandManager(CommandManager* commandManager) {
 	this->commandManager = commandManager;
 }
 

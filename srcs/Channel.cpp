@@ -18,6 +18,9 @@ Channel& Channel::operator=(const Channel& other) {
 
 Channel::~Channel() {}
 
+// Struct ClientAndMod
+Channel::ClientAndMod::ClientAndMod(const Client& client, char mod) : client(client), mod(mod) {}
+
 // getters
 const std::string Channel::getName() const {
 	return _name;
@@ -37,5 +40,14 @@ void Channel::setKey(const std::string& key) {
 }
 
 void Channel::addClient(const Client& client) {
-	
+	if (_clients.find(client.getSocket()) != _clients.end()) {
+		// client already in channel
+		return;
+	}
+	if (_clients.empty())
+		_clients.insert(std::make_pair(client.getSocket(), ClientAndMod(client, '@')));
+	else
+		_clients.insert(std::make_pair(client.getSocket(), ClientAndMod(client, '\0')));
+	// send join message to client
+	// send NAMES && end of NAMES message to client
 }

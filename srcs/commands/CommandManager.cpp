@@ -16,9 +16,10 @@ void CommandManager::addCommand(const std::string& name, CommandExecutor* comman
 
 CommandExecutor *CommandManager::getCommand(const std::string& name)
 {
+	// TODO or not: The command must either be a valid IRC command or a numeric
 	if (_commands.find(name) != _commands.end())
 		return _commands[name];
-	return nullptr;
+	return NULL;
 }
 
 std::map<std::string, CommandExecutor*> CommandManager::getCommands()

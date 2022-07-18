@@ -1,7 +1,6 @@
 #include "../includes/Server.hpp"
 #include "Irc.hpp"
 #include "commands/CommandExecutor.hpp"
-#include <algorithm>
 #include <iostream>
 
 Server::Server() {}
@@ -30,110 +29,56 @@ bool Server::userIsUsed(const std::string& user) {
 	return false;
 }
 
-// COMMAND HANDLER===========================================================================
+// Getter ===========================================================================
 
-CommandCode Server::getCommandCode(const std::string& cmd) {
-	if (cmd == "NICK") {
-		return NICK;
-	} else if (cmd == "USER") {
-		return USER;
-	} else if (cmd == "JOIN") {
-		return JOIN;
-	} else if (cmd == "PART") {
-		return PART;
-	} else if (cmd == "QUIT") {
-		return QUIT;
-	} else if (cmd == "PRIVMSG") {
-		return PRIVMSG;
-	} else if (cmd == "PING") {
-		return PING;
-	} else if (cmd == "PONG") {
-		return PONG;
-	} else {
-		return UNKNOWN;
-	}
+std::vector<pollfd>& Server::getPollfds() {
+	return _sockets;
 }
 
-void Server::do_cmd(SOCKET sock) {
-	Client& client = _clients[sock.fd];
-	std::vector<std::string> cmd_args = splitClientBuffer(client);
 
-	for (std::vector<std::string>::iterator it = cmd_args.begin(); it != cmd_args.end(); ++it) {
-		std::cout << "in cmd_args: " << *it << std::endl;
-	}
-	
-	std::cout << "COMMAND: " << buffer << "--------------------------------------"  <<std::endl;
+void Server::do_cmd(Client& sender) {
 
-	std::transform(cmd_args[0].begin(), cmd_args[0].end(), cmd_args[0].begin(), ::tolower);
+	std::cout << "msg received: " << sender.getBuffer() << std::endl;
+	while (sender.getBuffer().find("\r\n") != std::string::npos) {
 
-	Command cmd(cmd_args[0], cmd_args, client);
+		Command cmd(sender);
+		CommandExecutor *executor = cmd.parse(sender.getBuffer());
 
-	CommandExecutor *executor = Irc::getInstance().getCommandManager().getCommand(cmd_args[0]);
-
-	if (executor) {
-		executor->execute(cmd, cmd_args, client);
-	}
-	else {
-		std::cout << "Command not found" << std::endl;
-	}
-
-	if (!client.isRegistered() && !client.getNickname().empty() && !client.getUsername().empty()) {
-		client.setRegistered(true);
-		std::cout << "Client registered" << std::endl;
-		std::cout << "Client nickname: " << client.getNickname() << std::endl;
-		std::cout << "Client username: " << client.getUsername() << std::endl;
-		if (sock.revents & POLLOUT)
-			sendMsgTo(client, RPL_WELCOME);
-		else {
-			std::cout << "Client not ready" << std::endl;
+		if (executor) {
+			executor->execute(cmd, sender);
 		}
-		//send welcome message + check pollout
+		else {
+			std::cout << "Command not found" << std::endl;
+		}
+
+		if (!sender.isRegistered() && !sender.getNickname().empty() && !sender.getUsername().empty()) {
+			sender.setRegistered(true);
+			std::cout << "Client registered" << std::endl;
+			std::cout << "Client nickname: " << sender.getNickname() << std::endl;
+			std::cout << "Client username: " << sender.getUsername() << std::endl;
+			sendMsgTo(sender, RPL_WELCOME);
+			//send welcome message + check pollout
+		}
+		std::cout << "--------------------------------------" << std::endl;
 	}
-	cmd_args.clear();
-	std::cout << "--------------------------------------" << std::endl;
 }
 
 
 // ==========================================================================================
 
 int Server::sendMsgTo(const Client& client, const std::string& code) {
-	std::string msg = ":" + _srv_ip + " " + code + " " + client.getNickname() + " :"; // probably need to change that in future
-	if (code == RPL_WELCOME) {
-		msg += "Welcome to the IRC server " + client.getNickname() + "!" + "\r\n";
-		std::cout << msg << std::endl;
-		return send(client.getSocket(), msg.c_str(), msg.size(), 0);
+
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = ":" + _srv_ip + " " + code + " " + client.getNickname() + " :"; // probably need to change that in future
+		if (code == RPL_WELCOME) {
+			msg += "Welcome to the IRC server " + client.getNickname() + "!" + "\r\n";
+			std::cout << msg << std::endl;
+			return send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		}
 	}
+	std::cout << "Client not ready" << std::endl;
 	return -1;
 }
-
-std::vector<std::string> Server::splitClientBuffer(Client& client) {
-	std::string& buffer = client.getBuffer();
-	std::vector<std::string> cmd_args;
-
-	size_t pos = buffer.find_first_of("\r\n");
-	std::string cmd = buffer.substr(0, pos);
-	std::cout << "cmd:" << cmd << std::endl;
-	buffer.erase(0, pos + 2); // \n ? // probably need to change that in future
-	std::cout << "buffer:" << buffer << std::endl;
-
-	// split the buffer into cmd and args
-	const char* tmp = cmd.c_str();
-	while (tmp) {
-		while (*tmp == ' ') 
-			++tmp;
-		size_t pos = std::string(tmp).find(" ");
-		if (pos != std::string::npos) {
-			cmd_args.push_back(std::string(tmp).substr(0, pos));
-			tmp += pos;
-		}
-		else {
-			cmd_args.push_back(std::string(tmp));
-			tmp = NULL;
-		}
-	}
-	return cmd_args;
-}
-
 
 int Server::createServerSocket(int port) {
 	// Creating socket file descriptor
@@ -203,19 +148,14 @@ int Server::newConnection() {
 
 	// Add new client to clients list, hummmm
 	Client newClient(new_socket, client_addr);
-	_clients[new_socket] = newClient;;
-
-	std::cout << "new client socket: " << newSocket.fd << std::endl;
-
-	
-	// std::cout << "New connection: " << newClient.getNickname() << std::endl;
+	_clients[new_socket] = newClient;
 
 	return 0;
 }
 
 int Server::recvMsgFrom(SocketIt socket) {
 	char buffer[1024] = {0};
-	Client& client = _clients[socket->fd];
+	Client& sender = _clients[socket->fd];
 	int n;
 	if ((n = recv(socket->fd, buffer, 1024, 0)) < 0) {
 		// _clients.erase(socket->fd);
@@ -224,22 +164,13 @@ int Server::recvMsgFrom(SocketIt socket) {
 		return 1;
 	}
 	if (n == 0) {
-		std::cout << client.getNickname() << " disconnected" << std::endl;
+		std::cout << sender.getNickname() << " disconnected" << std::endl;
 		_clients.erase(socket->fd);
 		_sockets.erase(socket);
 		return 0;
 	}
-	client.setBuffer(buffer);
-	std::string msg = client.getBuffer();
-	if (msg.find("\r\n") == std::string::npos) {
-		std::cout << "msg not complete in:" << std::endl;
-		return 1;
-	}
-	else {
-		std::cout << "msg: " << msg << std::endl;
-		do_cmd(*socket);
-	}
-	// std::cout << "Received: " << buffer << std::endl;
+	sender.setBuffer(buffer);
+	do_cmd(sender);
 	return 1;
 }
 

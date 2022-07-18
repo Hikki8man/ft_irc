@@ -6,7 +6,7 @@
 class UserCommand : public CommandExecutor
 {
 	public:
-		void execute(const Command& cmd, std::vector<std::string>& args, Client& sender);
+		void execute(const Command& cmd, Client& sender);
 };
 
 #endif

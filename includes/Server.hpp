@@ -3,11 +3,11 @@
 
 #include "Client.hpp"
 #include "Channel.hpp"
-#include "NumericRepliesCode.hpp"
-#include "CommandCode.hpp"
+#include "ReplyCode.hpp"
+#include "ErrReplyCode.hpp"
 
 #include "sys/socket.h"
-#include "poll.h"
+#include <poll.h>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -20,6 +20,10 @@
 #define ClientIt std::map<SOCKET, Client>::iterator
 
 #define RESTRICTED_CHARACTERS " ,*!@.$:#&"
+#define CRLF "\r\n"
+
+class Client;
+class Channel;
 
 class Server {
 	public:
@@ -31,6 +35,7 @@ class Server {
 
 		bool nickIsUsed(const std::string&);
 		bool userIsUsed(const std::string&);
+		std::vector<pollfd>& getPollfds();
 		Server& operator=(const Server&);
 	private:
 		Server(const Server&);
@@ -40,10 +45,7 @@ class Server {
 		int recvMsgFrom(SocketIt);
 		int sendMsgTo(const Client&, const std::string&);
 
-		enum CommandCode getCommandCode(const std::string&);
-		void do_cmd(pollfd&);
-		void nickCmd(Client&, std::vector<std::string>&);
-		void joinCmd(Client&, std::vector<std::string>&);
+		void do_cmd(Client&);
 
 		std::vector<std::string> splitClientBuffer(Client& client);
 
