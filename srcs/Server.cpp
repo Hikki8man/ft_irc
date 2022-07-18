@@ -11,19 +11,13 @@ Server& Server::operator=(const Server&) {
 	return *this;
 }
 
-Server::~Server() {}
+Server::~Server() {
+	// TODO close all clients
+}
 
 bool Server::nickIsUsed(const std::string& nick) {
 	for (ClientIt it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->second.getNickname() == nick)
-			return true;
-	}
-	return false;
-}
-
-bool Server::userIsUsed(const std::string& user) {
-	for (ClientIt it = _clients.begin(); it != _clients.end(); it++) {
-		if (it->second.getUsername() == user)
 			return true;
 	}
 	return false;

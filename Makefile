@@ -45,6 +45,7 @@ SRCS 		+=	Command.cpp \
 				NickCommand.cpp \
 				UserCommand.cpp \
 				JoinCommand.cpp \
+				PartCommand.cpp \
 
 #===============================#
 #            HEADERS            #

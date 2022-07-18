@@ -9,17 +9,18 @@ void NickCommand::execute(const Command& cmd, Client& sender)
 		return;
 	}
 	// verify of characters are valid
-	std::string restrict(" ,*!@.$:#&");
-	if (args[0].find_first_of(restrict) != std::string::npos) {
-		Irc::getInstance().getServer()->send_err_erroneusnickname(sender, args[0]);
+	std::string nick(args[0]);
+	if (nick.find_first_of(" ,*!?@.") != std::string::npos || nick.find_first_of("$:#&", 0, 1) != std::string::npos) {
+		Irc::getInstance().getServer()->send_err_erroneusnickname(sender, nick);
 		return;
 	}
-	// verify if nick is already used
-	if (Irc::getInstance().getServer()->nickIsUsed(args[1])) {
-		Irc::getInstance().getServer()->send_err_nicknameinuse(sender, args[0]);
-		return;
-	} else
-		sender.setNickname(args[0]);
+	if (nick.length() > NICKLEN)
+		nick = nick.substr(0, NICKLEN);
+	if (Irc::getInstance().getServer()->nickIsUsed(nick)) {
+		Irc::getInstance().getServer()->send_err_nicknameinuse(sender, nick);
+	} else {
+		sender.setNickname(nick);
+		sender.setPrefix();
+	}
 	
-	sender.setPrefix();
 }

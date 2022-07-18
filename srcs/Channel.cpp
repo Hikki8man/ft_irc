@@ -57,13 +57,14 @@ void Channel::addClient(const Client& client, const std::string& key) {
 		_clients.insert(std::make_pair(client.getSocket(), ClientAndMod(client, '@')));
 	else
 		_clients.insert(std::make_pair(client.getSocket(), ClientAndMod(client, '\0')));
-	if (client.getPollfd().revents & POLLOUT)
-		Irc::getInstance().getServer()->send_join(client, *this);
+	for (std::map<int, ClientAndMod>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+			Irc::getInstance().getServer()->send_join(it->second.client, client, *this);
+	Irc::getInstance().getServer()->send_rpl_namreply(client, *this);
+	Irc::getInstance().getServer()->send_rpl_endofnames(client, *this);
+}
 
-	for (std::map<int, ClientAndMod>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		if (it->second.client.getPollfd().revents & POLLOUT) {
-			Irc::getInstance().getServer()->send_rpl_namreply(it->second.client, *this);
-			Irc::getInstance().getServer()->send_rpl_endofnames(it->second.client, *this);
-		}
-	}
+void Channel::removeClient(const Client& client, const std::string& reason) {
+	for (std::map<int, ClientAndMod>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+			Irc::getInstance().getServer()->send_part(it->second.client, client, *this, reason);
+	_clients.erase(client.getSocket());
 }

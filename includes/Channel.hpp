@@ -31,7 +31,7 @@ class Channel {
 		const std::map<int, ClientAndMod>& getClients() const;
 		
 		void addClient(const Client&, const std::string& key = "");
-		void removeClient(const Client&);
+		void removeClient(const Client&, const std::string& reason = "");
 		
 	private:
 		std::string _name, _key;

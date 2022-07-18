@@ -13,13 +13,26 @@ void Server::send_rpl_welcome(const Client& client) {
 }
 
 // ========== JOIN ==========
-void  Server::send_join(const Client& client, const Channel& chan) {
+void  Server::send_join(const Client& client, const Client& joiner, const Channel& chan) {
 	if (client.getPollfd().revents & POLLOUT) {
-			std::string msg = client.getPrefix() + " JOIN " + chan.getName() + CRLF;
+			std::string msg = joiner.getPrefix() + " JOIN " + chan.getName() + CRLF;
 			int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
 			if (ret == -1)
 				std::cerr << "Error while sending JOIN message to client" << std::endl;			
 		}
+}
+
+// ========== PART ==========
+void Server::send_part(const Client& client, const Client& leaver, const Channel& chan, const std::string& reason) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = leaver.getPrefix() + " PART " + chan.getName();
+		if (!reason.empty())
+			msg += " :" + reason;
+		msg += CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending PART message to client" << std::endl;
+	}
 }
 
 // ========== RPL_NAMREPLY (353) ==========

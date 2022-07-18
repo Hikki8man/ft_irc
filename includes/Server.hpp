@@ -20,6 +20,8 @@
 #define RESTRICTED_CHARACTERS " ,*!@.$:#&"
 #define CRLF "\r\n"
 #define BUFFER_MAX 512
+#define USERLEN 18
+#define NICKLEN 31
 
 class Client;
 class Channel;
@@ -33,10 +35,10 @@ class Server {
 		int run(int port);
 
 		bool nickIsUsed(const std::string&);
-		bool userIsUsed(const std::string&);
 
 		// Send Reply to client
-		void send_join(const Client&, const Channel&);
+		void send_join(const Client&, const Client&, const Channel&);
+		void send_part(const Client&, const Client&, const Channel&, const std::string&);
 		void send_rpl_welcome(const Client&);
 		void send_rpl_namreply(const Client&, const Channel&);
 		void send_rpl_endofnames(const Client&, const Channel&);
@@ -46,7 +48,9 @@ class Server {
 		void send_err_erroneusnickname(const Client&, const std::string&);
 		void send_err_nicknameinuse(const Client&, const std::string&);
 		void send_err_nosuchchannel(const Client&, const std::string&);
+		void send_err_notonchannel(const Client&, const std::string&);
 		void send_err_needmoreparams(const Client&, const std::string&);
+		void send_err_alreadyregistered(const Client&);
 
 
 		std::map<std::string, Channel>& getChannels();
