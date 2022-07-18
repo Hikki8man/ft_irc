@@ -30,6 +30,10 @@ const std::string Channel::getKey() const {
 	return _key;
 }
 
+const std::map<int, Channel::ClientAndMod>& Channel::getClients() const {
+	return _clients;
+}
+
 // setters
 void Channel::setName(const std::string& name) {
 	_name = name;
@@ -53,12 +57,13 @@ void Channel::addClient(const Client& client, const std::string& key) {
 		_clients.insert(std::make_pair(client.getSocket(), ClientAndMod(client, '@')));
 	else
 		_clients.insert(std::make_pair(client.getSocket(), ClientAndMod(client, '\0')));
-		if (client.getPollfd().revents & POLLOUT) {
-			std::string msg = client.getPrefix() + " JOIN " + _name + CRLF;
-			int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
-			if (ret == -1)
-				std::cerr << "Error while sending JOIN message to client" << std::endl;
-			
+	if (client.getPollfd().revents & POLLOUT)
+		Irc::getInstance().getServer()->send_join(client, *this);
+
+	for (std::map<int, ClientAndMod>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		if (it->second.client.getPollfd().revents & POLLOUT) {
+			Irc::getInstance().getServer()->send_rpl_namreply(it->second.client, *this);
+			Irc::getInstance().getServer()->send_rpl_endofnames(it->second.client, *this);
 		}
-	// send NAMES && end of NAMES message to client
+	}
 }

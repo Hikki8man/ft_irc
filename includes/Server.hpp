@@ -37,6 +37,15 @@ class Server {
 		bool nickIsUsed(const std::string&);
 		bool userIsUsed(const std::string&);
 
+		// Send Reply to client
+		void send_join(const Client&, const Channel&);
+		void send_rpl_welcome(const Client&);
+		void send_rpl_namreply(const Client&, const Channel&);
+		void send_rpl_endofnames(const Client&, const Channel&);
+
+		// Send Error Reply to client
+		
+
 		std::map<std::string, Channel>& getChannels();
 		std::vector<pollfd>& getPollfds();
 		const std::string getPrefix() const;
@@ -47,7 +56,7 @@ class Server {
 		void setPrefix();
 		int newConnection();
 		int recvMsgFrom(SocketIt);
-		int sendMsgTo(const Client&, const int&);
+
 
 		void do_cmd(Client&);
 
