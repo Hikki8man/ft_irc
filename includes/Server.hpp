@@ -20,6 +20,7 @@
 #define ClientIt std::map<SOCKET, Client>::iterator
 
 #define RESTRICTED_CHARACTERS " ,*!@.$:#&"
+#define CRLF "\r\n"
 
 class Client;
 class Channel;
@@ -44,10 +45,7 @@ class Server {
 		int recvMsgFrom(SocketIt);
 		int sendMsgTo(const Client&, const std::string&);
 
-		enum CommandCode getCommandCode(const std::string&);
-		void do_cmd(pollfd&);
-		void nickCmd(Client&, std::vector<std::string>&);
-		void joinCmd(Client&, std::vector<std::string>&);
+		void do_cmd(Client&);
 
 		std::vector<std::string> splitClientBuffer(Client& client);
 

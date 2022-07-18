@@ -6,10 +6,6 @@ void UserCommand::execute(const Command& cmd, Client& sender)
 	const std::vector<std::string>& args = cmd.getArgs();
 	bool foundRealName = false;
 
-	for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it) {
-		std::cout << "in cmd_args: " << *it << std::endl;
-	}
-
 	sender.setRealName(args[args.size() - 1]); // todo: redo
 	// for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it) {
 	// 	if (it->find(":", 0, 1) != std::string::npos) {
