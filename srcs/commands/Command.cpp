@@ -44,7 +44,6 @@ CommandExecutor *Command::parse(std::string& buffer) {
 	// if cmd exists, parse the args
 	std::vector<std::string> args;
 	while (!cmd.empty()) {
-		std::cout << "in loop" << std::endl;
 		pos = cmd.find_first_not_of(' ');
 		if (pos != std::string::npos)
 			cmd.erase(0, pos);
