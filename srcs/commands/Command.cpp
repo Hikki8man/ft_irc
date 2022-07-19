@@ -35,7 +35,7 @@ CommandExecutor *Command::parse(std::string& buffer) {
 		_name = cmd;
 		cmd.clear();
 	}
-	std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
+	std::transform(_name.begin(), _name.end(), _name.begin(), ::toupper);
 	CommandExecutor *executor = Irc::getInstance().getCommandManager()->getCommand(_name);
 	// if cmd doesn't exist, stop parsing and return NULL
 	if (!executor)
