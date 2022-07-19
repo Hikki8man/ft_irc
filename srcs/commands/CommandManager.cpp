@@ -10,13 +10,13 @@
 
 CommandManager::CommandManager()
 {
-	addCommand("nick", new NickCommand());
-	addCommand("user", new UserCommand());
-	addCommand("join", new JoinCommand());
-	addCommand("part", new PartCommand());
-	addCommand("privmsg", new PrivmsgCommand());
-	addCommand("ping", new PingCommand());
-	addCommand("pass", new PassCommand());
+	addCommand("NICK", new NickCommand());
+	addCommand("USER", new UserCommand());
+	addCommand("JOIN", new JoinCommand());
+	addCommand("PART", new PartCommand());
+	addCommand("PRIVMSG", new PrivmsgCommand());
+	addCommand("PING", new PingCommand());
+	addCommand("PASS", new PassCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)
