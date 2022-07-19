@@ -9,6 +9,14 @@ class Client;
 
 class Channel {
 	public:
+
+		struct ClientAndMod {
+			ClientAndMod(const Client&, char);
+
+			const Client &client;
+			char mod;
+		};
+		
 		Channel();
 		Channel(const std::string& name);
 		Channel(const Channel&);
@@ -20,16 +28,10 @@ class Channel {
 
 		const std::string getName() const;
 		const std::string getKey() const;
+		const std::map<int, ClientAndMod>& getClients() const;
 		
-		void addClient(const Client&);
-		void removeClient(const Client&);
-
-		struct ClientAndMod {
-			ClientAndMod(const Client&, char);
-
-			const Client &client;
-			char mod;
-		};
+		void addClient(const Client&, const std::string& key = "");
+		void removeClient(const Client&, const std::string& reason = "");
 		
 	private:
 		std::string _name, _key;

@@ -30,6 +30,10 @@ const std::string Channel::getKey() const {
 	return _key;
 }
 
+const std::map<int, Channel::ClientAndMod>& Channel::getClients() const {
+	return _clients;
+}
+
 // setters
 void Channel::setName(const std::string& name) {
 	_name = name;
@@ -39,15 +43,27 @@ void Channel::setKey(const std::string& key) {
 	_key = key;
 }
 
-void Channel::addClient(const Client& client) {
+void Channel::addClient(const Client& client, const std::string& key) {
+	// Check if the client is already in the channel
 	if (_clients.find(client.getSocket()) != _clients.end()) {
-		// client already in channel
+		return;
+	}
+	else if (_key != key) {
+		Irc::getInstance().getServer()->send_err_badchannelkey(client, _name);
 		return;
 	}
 	if (_clients.empty())
 		_clients.insert(std::make_pair(client.getSocket(), ClientAndMod(client, '@')));
 	else
 		_clients.insert(std::make_pair(client.getSocket(), ClientAndMod(client, '\0')));
-	// send join message to client
-	// send NAMES && end of NAMES message to client
+	for (std::map<int, ClientAndMod>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+			Irc::getInstance().getServer()->send_join(it->second.client, client, *this);
+	Irc::getInstance().getServer()->send_rpl_namreply(client, *this);
+	Irc::getInstance().getServer()->send_rpl_endofnames(client, *this);
+}
+
+void Channel::removeClient(const Client& client, const std::string& reason) {
+	for (std::map<int, ClientAndMod>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+			Irc::getInstance().getServer()->send_part(it->second.client, client, *this, reason);
+	_clients.erase(client.getSocket());
 }

@@ -11,19 +11,13 @@ Server& Server::operator=(const Server&) {
 	return *this;
 }
 
-Server::~Server() {}
+Server::~Server() {
+	// TODO close all clients
+}
 
 bool Server::nickIsUsed(const std::string& nick) {
 	for (ClientIt it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->second.getNickname() == nick)
-			return true;
-	}
-	return false;
-}
-
-bool Server::userIsUsed(const std::string& user) {
-	for (ClientIt it = _clients.begin(); it != _clients.end(); it++) {
-		if (it->second.getUsername() == user)
 			return true;
 	}
 	return false;
@@ -35,6 +29,17 @@ std::vector<pollfd>& Server::getPollfds() {
 	return _sockets;
 }
 
+const std::string Server::getPrefix() const {
+	return _prefix;
+}
+
+// Setter ===========================================================================
+
+void Server::setPrefix() {
+	_prefix = std::string(":") + inet_ntoa(_srv_addr.sin_addr);
+}
+
+// Methods ==========================================================================
 
 void Server::do_cmd(Client& sender) {
 
@@ -53,32 +58,17 @@ void Server::do_cmd(Client& sender) {
 
 		if (!sender.isRegistered() && !sender.getNickname().empty() && !sender.getUsername().empty()) {
 			sender.setRegistered(true);
-			std::cout << "Client registered" << std::endl;
-			std::cout << "Client nickname: " << sender.getNickname() << std::endl;
-			std::cout << "Client username: " << sender.getUsername() << std::endl;
-			sendMsgTo(sender, RPL_WELCOME);
-			//send welcome message + check pollout
+			sender.setPrefix();
+			std::cout << "Client registered:" << std::endl;
+			std::cout << "Nickname: " << sender.getNickname() << std::endl;
+			std::cout << "Username: " << sender.getUsername() << std::endl;
+			send_rpl_welcome(sender);
 		}
 		std::cout << "--------------------------------------" << std::endl;
 	}
 }
 
-
-// ==========================================================================================
-
-int Server::sendMsgTo(const Client& client, const std::string& code) {
-
-	if (client.getPollfd().revents & POLLOUT) {
-		std::string msg = ":" + _srv_ip + " " + code + " " + client.getNickname() + " :"; // probably need to change that in future
-		if (code == RPL_WELCOME) {
-			msg += "Welcome to the IRC server " + client.getNickname() + "!" + "\r\n";
-			std::cout << msg << std::endl;
-			return send(client.getSocket(), msg.c_str(), msg.size(), 0);
-		}
-	}
-	std::cout << "Client not ready" << std::endl;
-	return -1;
-}
+// Server socket =========================================================================
 
 int Server::createServerSocket(int port) {
 	// Creating socket file descriptor
@@ -121,6 +111,7 @@ int Server::createServerSocket(int port) {
 	serverSocket.events = POLLIN;
 	_srv_ip = inet_ntoa(_srv_addr.sin_addr);
 	_sockets.push_back(serverSocket);
+	setPrefix();
 
 	return 0;
 }
@@ -154,16 +145,17 @@ int Server::newConnection() {
 }
 
 int Server::recvMsgFrom(SocketIt socket) {
-	char buffer[1024] = {0};
+	char buffer[BUFFER_MAX] = {0};
 	Client& sender = _clients[socket->fd];
 	int n;
-	if ((n = recv(socket->fd, buffer, 1024, 0)) < 0) {
+	if ((n = recv(socket->fd, buffer, BUFFER_MAX, 0)) < 0) {
 		// _clients.erase(socket->fd);
 		// _sockets.erase(socket); ??
 		perror("recv");
 		return 1;
 	}
 	if (n == 0) {
+		// need to remove client from clients list of channels
 		std::cout << sender.getNickname() << " disconnected" << std::endl;
 		_clients.erase(socket->fd);
 		_sockets.erase(socket);
@@ -172,6 +164,10 @@ int Server::recvMsgFrom(SocketIt socket) {
 	sender.setBuffer(buffer);
 	do_cmd(sender);
 	return 1;
+}
+
+std::map<std::string, Channel>& Server::getChannels() {
+	return _channels;
 }
 
 int Server::run(int port) {
