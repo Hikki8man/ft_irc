@@ -72,3 +72,12 @@ void Server::send_err_badchannelkey(const Client& client, const std::string& cha
 		send(client.getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
+
+// ========== ERR_NOTREGISTERED (451) ==========
+
+void Server::send_err_notregistered(const Client& client) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 451 " + client.getNickname() + " :You have not registered" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}

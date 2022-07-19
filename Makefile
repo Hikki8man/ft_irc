@@ -46,6 +46,7 @@ SRCS 		+=	Command.cpp \
 				UserCommand.cpp \
 				JoinCommand.cpp \
 				PartCommand.cpp \
+				PingCommand.cpp
 
 #===============================#
 #            HEADERS            #

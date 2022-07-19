@@ -52,11 +52,13 @@ class Server {
 		void send_err_badchannelkey(const Client&, const std::string&);
 		void send_err_needmoreparams(const Client&, const std::string&);
 		void send_err_alreadyregistered(const Client&);
+		void send_err_notregistered(const Client&);
 
 
 		std::map<std::string, Channel>& getChannels();
 		std::vector<pollfd>& getPollfds();
 		const std::string getPrefix() const;
+		const std::string getIp() const;
 	private:
 		Server(const Server&);
 

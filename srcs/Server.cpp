@@ -33,6 +33,10 @@ const std::string Server::getPrefix() const {
 	return _prefix;
 }
 
+const std::string Server::getIp() const {
+	return _srv_ip;
+}
+
 // Setter ===========================================================================
 
 void Server::setPrefix() {
@@ -50,7 +54,10 @@ void Server::do_cmd(Client& sender) {
 		CommandExecutor *executor = cmd.parse(sender.getBuffer());
 
 		if (executor) {
-			executor->execute(cmd, sender);
+			if (executor->isRegisteredOnly() && !sender.isRegistered())
+				Irc::getInstance().getServer()->send_err_notregistered(sender);
+			else
+				executor->execute(cmd, sender);
 		}
 		else {
 			std::cout << "Command not found" << std::endl;

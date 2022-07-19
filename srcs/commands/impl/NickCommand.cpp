@@ -1,6 +1,11 @@
 #include "commands/impl/NickCommand.hpp"
 #include "Irc.hpp"
 
+NickCommand::NickCommand()
+{
+	this->setRegisteredOnly(false);
+}
+
 void NickCommand::execute(const Command& cmd, Client& sender)
 {
 	const std::vector<std::string>& args = cmd.getArgs();
@@ -22,5 +27,4 @@ void NickCommand::execute(const Command& cmd, Client& sender)
 		sender.setNickname(nick);
 		sender.setPrefix();
 	}
-	
 }

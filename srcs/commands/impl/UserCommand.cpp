@@ -1,6 +1,10 @@
 #include "commands/impl/UserCommand.hpp"
 #include "Irc.hpp"
 
+UserCommand::UserCommand() {
+	this->setRegisteredOnly(false);
+}
+
 void UserCommand::execute(const Command& cmd, Client& sender)
 {
 	const std::vector<std::string>& args = cmd.getArgs();

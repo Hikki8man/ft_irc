@@ -4,6 +4,7 @@
 #include "commands/impl/UserCommand.hpp"
 #include "commands/impl/JoinCommand.hpp"
 #include "commands/impl/PartCommand.hpp"
+#include "commands/impl/PingCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -11,6 +12,7 @@ CommandManager::CommandManager()
 	addCommand("user", new UserCommand());
 	addCommand("join", new JoinCommand());
 	addCommand("part", new PartCommand());
+	addCommand("ping", new PingCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)
