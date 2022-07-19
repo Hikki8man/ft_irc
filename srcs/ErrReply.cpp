@@ -1,9 +1,41 @@
 #include "../includes/Server.hpp"
 
+// ========== ERR_NOSUCHNICK ==========
+void Server::send_err_nosuchnick(const Client& client, const std::string& nick) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 401 " + client.getNickname() + " " + nick + " :No such nick" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
 // ========== ERR_NOSUCHCHANNEL (403) ==========
 void Server::send_err_nosuchchannel(const Client& client, const std::string& channel) {
 	if (client.getPollfd().revents & POLLOUT) {
 		std::string msg = getPrefix() + " 403 " + client.getNickname() + " " + channel + " :No such channel" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
+// ========== ERR_CANNOTSENDTOCHAN (404) ==========
+void Server::send_err_cannotsendtochan(const Client& client, const std::string& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 404 " + client.getNickname() + " " + channel + " :Cannot send to channel" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
+// ========== ERR_NORECIPIENT (411) ==========
+void Server::send_err_norecipient(const Client& client, const std::string& command) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 411 " + client.getNickname() + " " + command + " :No recipient given" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
+// ========== ERR_NOTEXTTOSEND (412) ==========
+void Server::send_err_notexttosend(const Client& client, const std::string& command) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 412 " + client.getNickname() + " :No text to send " + "(" + command + ")" + CRLF;
 		send(client.getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }

@@ -4,6 +4,7 @@
 #include "commands/impl/UserCommand.hpp"
 #include "commands/impl/JoinCommand.hpp"
 #include "commands/impl/PartCommand.hpp"
+#include "commands/impl/PrivmsgCommand.hpp"
 #include "commands/impl/PingCommand.hpp"
 #include "commands/impl/PassCommand.hpp"
 
@@ -13,6 +14,7 @@ CommandManager::CommandManager()
 	addCommand("user", new UserCommand());
 	addCommand("join", new JoinCommand());
 	addCommand("part", new PartCommand());
+	addCommand("privmsg", new PrivmsgCommand());
 	addCommand("ping", new PingCommand());
 	addCommand("pass", new PassCommand());
 }
