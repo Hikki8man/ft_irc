@@ -78,7 +78,7 @@ void Server::do_cmd(Client& sender) {
 		CommandExecutor *executor = cmd.parse(sender.getBuffer());
 
 		if (executor) {
-			if (cmd.getName() != "pass" && !sender.isLogged() && getPassword().length() > 0) {
+			if (cmd.getName() != "PASS" && !sender.isLogged() && getPassword().length() > 0) {
 				std::string msg = "Please use PASS before doing anything else" + std::string(CRLF);
 				send(sender.getSocket(), msg.c_str(), msg.size(), 0);
 			}
@@ -87,7 +87,7 @@ void Server::do_cmd(Client& sender) {
 			else
 				executor->execute(cmd, sender);
 		}
-		else {
+		else if (cmd.getName() != "CAP") {
 			send_err_unknowncommand(sender, cmd.getName());
 		}
 
