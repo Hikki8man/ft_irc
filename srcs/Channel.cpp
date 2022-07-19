@@ -34,6 +34,14 @@ const std::map<int, Channel::ClientAndMod>& Channel::getClients() const {
 	return _clients;
 }
 
+const Client &Channel::getClient(const std::string& nick) const {
+	for (std::map<int, Channel::ClientAndMod>::const_iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (it->second.client.getNickname() == nick)
+			return it->second.client;
+	}
+	return _clients.begin()->second.client;
+}
+
 // setters
 void Channel::setName(const std::string& name) {
 	_name = name;
@@ -45,6 +53,7 @@ void Channel::setKey(const std::string& key) {
 
 void Channel::addClient(const Client& client, const std::string& key) {
 	// Check if the client is already in the channel
+	std::cout << "Channel: " << _name << " Key: " << _key << std::endl;
 	if (_clients.find(client.getSocket()) != _clients.end()) {
 		return;
 	}

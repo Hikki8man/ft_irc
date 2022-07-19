@@ -33,6 +33,22 @@ const std::string Server::getPrefix() const {
 	return _prefix;
 }
 
+std::map<std::string, Channel>& Server::getChannels() {
+	return _channels;
+}
+
+std::map<SOCKET, Client>& Server::getClients() {
+	return _clients;
+}
+
+Client &Server::getClient(const std::string& nick) {
+	for (ClientIt it = _clients.begin(); it != _clients.end(); it++) {
+		if (it->second.getNickname() == nick)
+			return it->second;
+	}
+	return _clients.begin()->second;
+}
+
 // Setter ===========================================================================
 
 void Server::setPrefix() {
@@ -164,10 +180,6 @@ int Server::recvMsgFrom(SocketIt socket) {
 	sender.setBuffer(buffer);
 	do_cmd(sender);
 	return 1;
-}
-
-std::map<std::string, Channel>& Server::getChannels() {
-	return _channels;
 }
 
 int Server::run(int port) {
