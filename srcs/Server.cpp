@@ -47,6 +47,7 @@ Client &Server::getClient(const std::string& nick) {
 			return it->second;
 	}
 	return _clients.begin()->second;
+}
 
 const std::string Server::getIp() const {
 	return _srv_ip;
