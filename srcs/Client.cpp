@@ -1,4 +1,5 @@
 #include "../includes/Client.hpp"
+#include "Irc.hpp"
 
 Client::Client() : _socket(), _addr(), _registered(false) {}
 
@@ -89,5 +90,13 @@ void Client::setPrefix() {
 
 
 bool Client::isRegistered() const {
-	return _registered;
+	return _registered && isLogged();
+}
+
+void Client::setLogged(bool logged) {
+	_logged = logged;
+}
+
+const bool Client::isLogged() const {
+	return _logged || Irc::getInstance().getServer()->getPassword().length() == 0;
 }
