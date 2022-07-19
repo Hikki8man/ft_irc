@@ -3,7 +3,7 @@
 #include "commands/CommandExecutor.hpp"
 #include <iostream>
 
-Server::Server() {}
+Server::Server() : _password() {}
 
 Server::Server(const Server&) {}
 
@@ -47,12 +47,23 @@ Client &Server::getClient(const std::string& nick) {
 			return it->second;
 	}
 	return _clients.begin()->second;
+
+const std::string Server::getIp() const {
+	return _srv_ip;
+}
+
+const std::string Server::getPassword() const {
+	return _password;
 }
 
 // Setter ===========================================================================
 
 void Server::setPrefix() {
 	_prefix = std::string(":") + inet_ntoa(_srv_addr.sin_addr);
+}
+
+void Server::setPassword(const std::string& password) {
+	_password = password;
 }
 
 // Methods ==========================================================================
@@ -66,18 +77,26 @@ void Server::do_cmd(Client& sender) {
 		CommandExecutor *executor = cmd.parse(sender.getBuffer());
 
 		if (executor) {
-			executor->execute(cmd, sender);
+			if (cmd.getName() != "pass" && !sender.isLogged() && getPassword().length() > 0) {
+				std::string msg = "Please use PASS before doing anything else" + std::string(CRLF);
+				send(sender.getSocket(), msg.c_str(), msg.size(), 0);
+			}
+			else if (executor->isRegisteredOnly() && !sender.isRegistered())
+				Irc::getInstance().getServer()->send_err_notregistered(sender);
+			else
+				executor->execute(cmd, sender);
 		}
 		else {
-			std::cout << "Command not found" << std::endl;
+			send_err_unknowncommand(sender, cmd.getName());
 		}
 
-		if (!sender.isRegistered() && !sender.getNickname().empty() && !sender.getUsername().empty()) {
+		if (!sender.isRegistered() && !sender.getNickname().empty() && !sender.getUsername().empty() && sender.isLogged()) {
 			sender.setRegistered(true);
 			sender.setPrefix();
 			std::cout << "Client registered:" << std::endl;
 			std::cout << "Nickname: " << sender.getNickname() << std::endl;
 			std::cout << "Username: " << sender.getUsername() << std::endl;
+			std::cout << "Logged: " << sender.isLogged() << " registered: " << sender.isRegistered() << std::endl;
 			send_rpl_welcome(sender);
 		}
 		std::cout << "--------------------------------------" << std::endl;

@@ -6,6 +6,7 @@
 class NickCommand : public CommandExecutor
 {
 	public:
+		NickCommand();
 		void execute(const Command& cmd, Client& sender);
 };
 

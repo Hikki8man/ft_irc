@@ -5,6 +5,8 @@
 #include "commands/impl/JoinCommand.hpp"
 #include "commands/impl/PartCommand.hpp"
 #include "commands/impl/PrivmsgCommand.hpp"
+#include "commands/impl/PingCommand.hpp"
+#include "commands/impl/PassCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -13,6 +15,8 @@ CommandManager::CommandManager()
 	addCommand("join", new JoinCommand());
 	addCommand("part", new PartCommand());
 	addCommand("privmsg", new PrivmsgCommand());
+	addCommand("ping", new PingCommand());
+	addCommand("pass", new PassCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)

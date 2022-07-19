@@ -57,13 +57,19 @@ class Server {
 		void send_err_norecipient(const Client&, const std::string&);
 		void send_err_notexttosend(const Client&, const std::string&);
 		void send_err_cannotsendtochan(const Client&, const std::string&);
-
+		void send_err_notregistered(const Client&);
+		void send_err_passwdmismatch(const Client&);
+		void send_err_unknowncommand(const Client&, const std::string&);
 
 		std::map<std::string, Channel>& getChannels();
 		std::map<SOCKET, Client>& getClients();
 		Client& getClient(const std::string&);
 		std::vector<pollfd>& getPollfds();
 		const std::string getPrefix() const;
+		const std::string getIp() const;
+		const std::string getPassword() const;
+
+		void setPassword(const std::string& password);
 	private:
 		Server(const Server&);
 
@@ -90,6 +96,9 @@ class Server {
 
 		// list of channels
 		std::map<std::string, Channel> _channels;
+
+		// password
+		std::string _password;
 
 };
 

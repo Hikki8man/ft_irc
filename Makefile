@@ -47,6 +47,8 @@ SRCS 		+=	Command.cpp \
 				JoinCommand.cpp \
 				PartCommand.cpp \
 				PrivmsgCommand.cpp \
+				PingCommand.cpp \
+				PassCommand.cpp
 
 #===============================#
 #            HEADERS            #
