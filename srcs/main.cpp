@@ -26,6 +26,10 @@ int main(int ac, char **av) {
 	Server server;
 	CommandManager commandManager;
 
+
+	if (ac == 3)
+		server.setPassword(av[2]);
+
 	irc.setServer(&server);
 	irc.setCommandManager(&commandManager);
 

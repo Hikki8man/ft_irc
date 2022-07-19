@@ -26,6 +26,7 @@ class Client {
 		const pollfd& getPollfd() const;
 		std::string& getBuffer();
 		const std::string getPrefix() const;
+		const bool isLogged() const;
 
 		void setNickname(const std::string& nick);
 		void setUsername(const std::string& user);
@@ -33,11 +34,13 @@ class Client {
 		void setRealName(const std::string& realName);
 		void setPrefix();
 		void setRegistered(bool);
+		void setLogged(bool);
 
 		bool isRegistered() const;
 
 	private:
 		bool _registered;
+		bool _logged;
 		SOCKET _socket;
 		struct sockaddr_in _addr;
 

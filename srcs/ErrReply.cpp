@@ -81,3 +81,21 @@ void Server::send_err_notregistered(const Client& client) {
 		send(client.getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
+
+// ========== ERR_PASSWDMISMATCH (464) ==========
+
+void Server::send_err_passwdmismatch(const Client& client) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 464 " + client.getNickname() + " :Password incorrect" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
+// ========== ERR_UNKNOWNCOMMAND (421) ==========
+
+void Server::send_err_unknowncommand(const Client& client, const std::string& command) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 421 " + client.getNickname() + " " + command + " :Unknown command" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
