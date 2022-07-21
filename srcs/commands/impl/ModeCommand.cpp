@@ -20,10 +20,10 @@ void ModeCommand::execute(const Command& cmd, Client& sender) {
     }
 
     if (args.size() == 2) {
-        Channel channel = Irc::getInstance().getServer()->getChannels()[target];
+        Channel* channel = &Irc::getInstance().getServer()->getChannels()[target];
         std::string modes = args[1];
 
-        if (channel.getClientAndMod(sender.getNickname()).mod != '@') {
+        if (channel->getClientAndMod(sender.getNickname()).mod != '@') {
             Irc::getInstance().getServer()->send_err_chanoprivsneeded(sender, target);
             return;
         }
@@ -39,19 +39,16 @@ void ModeCommand::execute(const Command& cmd, Client& sender) {
                 Irc::getInstance().getServer()->send_err_unknownmode(sender, mode);
                 continue;
             }
-            Channel::Mode modeId = channel.getModeById(mode);
-            std::vector<Channel::Mode>::iterator elem = std::find(channel.getModes().begin(), channel.getModes().end(), modeId);
+            
             if (remove) {
                     std::cout << "remove: " << mode << std::endl;
-                if (elem != channel.getModes().end())
-                    channel.getModes().erase(elem);
+                if (channel->getModes().find(mode) != std::string::npos)
+                    channel->removeMode(mode);
             } else {
                 std::cout << "add: " << mode << std::endl;
-                if (elem == channel.getModes().end())
-                    channel.getModes().push_back(modeId);
-                //std::cout << channel.getModeId(channel.getModes().at(0)) << std::endl;
-                std::cout << (elem == channel.getModes().end()) << std::endl;
-                std::cout << channel.getModes().size() << std::endl;
+                if (channel->getModes().find(mode) == std::string::npos)
+                    channel->addMode(mode);
+                std::cout << "modes: " << channel->getModes() << std::endl;
             }
         }
         //Irc::getInstance().getServer()->send_rpl_channelmodeis(sender, Irc::getInstance().getServer()->getChannels()[target]);

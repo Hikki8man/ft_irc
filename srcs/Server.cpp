@@ -3,7 +3,7 @@
 #include "commands/CommandExecutor.hpp"
 #include <iostream>
 
-Server::Server() : _password() {}
+Server::Server() : _password("") {}
 
 Server::Server(const Server&) {}
 

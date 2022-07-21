@@ -120,7 +120,7 @@ void Server::send_rpl_endofnames(const Client& client, const Channel& chan) {
 
 void Server::send_rpl_channelmodeis(const Client& client, const Channel& chan) {
 	if (client.getPollfd().revents & POLLOUT) {
-		std::string msg = getPrefix() + " 324 " + client.getNickname() + " " + chan.getName() + " +" + chan.getModeString() + CRLF;
+		std::string msg = getPrefix() + " 324 " + client.getNickname() + " " + chan.getName() + " +" + chan.getModes() + CRLF;
 		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
 		if (ret == -1)
 			std::cerr << "Error while sending RPL_CHANNELMODEIS message to client" << std::endl;

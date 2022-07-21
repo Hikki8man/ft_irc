@@ -1,6 +1,6 @@
 #include "../includes/Channel.hpp"
 
-Channel::Channel() : _name("") {}
+Channel::Channel() : _name(""), _modes("") {}
 
 Channel::Channel(const std::string& name) : _name(name) {}
 
@@ -51,52 +51,10 @@ const Client &Channel::findClientByName(const std::string& nick) const {
 	return _clients.begin()->second.client;
 }
 
-std::vector<Channel::Mode> Channel::getModes() const {
+std::string Channel::getModes() const {
 	return _modes;
 }
 
-
-const Channel::Mode Channel::getModeById(char id) const {
-	switch (id) {
-		case 's':
-			return secret;
-		case 't':
-			return protected_topic;
-		case 'n':
-			return no_external_msg;
-		case 'i':
-			return invite;
-		case 'k':
-			return key;
-		case 'l':
-			return limit;
-		case 'm':
-			return moderated;
-		default:
-			break;
-	}
-}
-
-const std::string Channel::getModeId(Mode mode) const {
-	switch (mode) {
-		case secret:
-			return "s";
-		case protected_topic:
-			return "t";
-		case no_external_msg:
-			return "n";
-		case invite:
-			return "i";
-		case key:
-			return "k";
-		case limit:
-			return "l";
-		case moderated:
-			return "m";
-		default:
-			break;
-	}
-}
 
 // setters
 void Channel::setName(const std::string& name) {
@@ -133,10 +91,10 @@ void Channel::removeClient(const Client& client, const std::string& reason) {
 	_clients.erase(client.getSocket());
 }
 
-const std::string Channel::getModeString() const {
-	std::string modeString = "";
-	for (std::vector<Mode>::const_iterator it = _modes.begin(); it != _modes.end(); ++it) {
-		modeString += getModeId(*it);
-	}
-	return modeString;
+void Channel::addMode(char mode) {
+	_modes.push_back(mode);
+}
+
+void Channel::removeMode(char mode) {
+	_modes.erase(mode);
 }

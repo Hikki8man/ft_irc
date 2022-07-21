@@ -5,12 +5,18 @@
 #include <iostream>
 #include "Client.hpp"
 
+#define SECRET "s"
+#define PROTECTED_TOPIC "t"
+#define NO_EXTERNAL_MESSAGES "n"
+#define INVITE "i"
+#define KEY "k"
+#define LIMIT "l"
+#define MODERATED "m"
+
 class Client;
 
 class Channel {
 	public:
-
-		enum Mode { limit, invite, key, moderated, secret, protected_topic, no_external_msg };
 
 		struct ClientAndMod {
 			ClientAndMod(const Client&, char);
@@ -33,18 +39,18 @@ class Channel {
 		const std::map<int, ClientAndMod>& getClients() const;
 		const Client &findClientByName(const std::string& nick) const;
 		const ClientAndMod &getClientAndMod(const std::string& nick) const;
-		const std::string getModeString() const;
-		std::vector<Mode> getModes() const;
-		const std::string getModeId(Channel::Mode mode) const;
-		const Channel::Mode getModeById(char id) const;
+		std::string getModes() const;
 		
 		void addClient(const Client&, const std::string& key = "");
 		void removeClient(const Client&, const std::string& reason = "");
+
+		void addMode(char mode);
+		void removeMode(char mode);
 		
 	private:
 		std::string 				_name, _key;
 		std::map<int, ClientAndMod>	_clients;
-		std::vector<Mode>			_modes;
+		std::string					_modes;
 };
 
 #endif
