@@ -8,6 +8,7 @@
 #include "commands/impl/PingCommand.hpp"
 #include "commands/impl/PassCommand.hpp"
 #include "commands/impl/NoticeCommand.hpp"
+#include "commands/impl/ModeCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -19,6 +20,7 @@ CommandManager::CommandManager()
 	addCommand("PING", new PingCommand());
 	addCommand("PASS", new PassCommand());
 	addCommand("NOTICE", new NoticeCommand());
+	addCommand("MODE", new ModeCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)

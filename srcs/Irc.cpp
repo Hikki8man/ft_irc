@@ -1,4 +1,5 @@
 #include "Irc.hpp"
+#include "Channel.hpp"
 
 Irc& Irc::getInstance() {
 	return *Irc::instance;

@@ -50,13 +50,28 @@ SRCS 		+=	Command.cpp \
 				PingCommand.cpp \
 				PassCommand.cpp \
 				NoticeCommand.cpp \
+				ModeCommand.cpp \
 
 #===============================#
 #            HEADERS            #
 #===============================#
 
 HEADERS		=	Irc.hpp \
-				CommandExecutor.hpp
+				Server.hpp \
+				Client.hpp \
+				Channel.hpp \
+				common.hpp \
+				Command.hpp \
+				CommandManager.hpp \
+				CommandExecutor.hpp \
+				JoinCommand.hpp \
+				ModeCommand.hpp \
+				NickCommand.hpp \
+				PartCommand.hpp \
+				PassCommand.hpp \
+				PingCommand.hpp \
+				PrivmsgCommand.hpp \
+				UserCommand.hpp \
 
 #===============================#
 #            OBJECTS            #

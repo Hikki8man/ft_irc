@@ -35,12 +35,67 @@ const std::map<int, Channel::ClientAndMod>& Channel::getClients() const {
 	return _clients;
 }
 
+const Channel::ClientAndMod &Channel::getClientAndMod(const std::string& nick) const {
+	for (std::map<int, Channel::ClientAndMod>::const_iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (it->second.client.getNickname() == nick)
+			return it->second;
+	}
+	return _clients.begin()->second;
+}
+
 const Client &Channel::findClientByName(const std::string& nick) const {
 	for (std::map<int, Channel::ClientAndMod>::const_iterator it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->second.client.getNickname() == nick)
 			return it->second.client;
 	}
 	return _clients.begin()->second.client;
+}
+
+std::vector<Channel::Mode> Channel::getModes() const {
+	return _modes;
+}
+
+
+const Channel::Mode Channel::getModeById(char id) const {
+	switch (id) {
+		case 's':
+			return secret;
+		case 't':
+			return protected_topic;
+		case 'n':
+			return no_external_msg;
+		case 'i':
+			return invite;
+		case 'k':
+			return key;
+		case 'l':
+			return limit;
+		case 'm':
+			return moderated;
+		default:
+			break;
+	}
+}
+
+const std::string Channel::getModeId(Mode mode) const {
+	switch (mode) {
+		case secret:
+			return "s";
+		case protected_topic:
+			return "t";
+		case no_external_msg:
+			return "n";
+		case invite:
+			return "i";
+		case key:
+			return "k";
+		case limit:
+			return "l";
+		case moderated:
+			return "m";
+		default:
+			break;
+	}
 }
 
 // setters
@@ -76,4 +131,12 @@ void Channel::removeClient(const Client& client, const std::string& reason) {
 	for (std::map<int, ClientAndMod>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 			Irc::getInstance().getServer()->send_part(it->second.client, client, *this, reason);
 	_clients.erase(client.getSocket());
+}
+
+const std::string Channel::getModeString() const {
+	std::string modeString = "";
+	for (std::vector<Mode>::const_iterator it = _modes.begin(); it != _modes.end(); ++it) {
+		modeString += getModeId(*it);
+	}
+	return modeString;
 }
