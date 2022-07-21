@@ -98,3 +98,7 @@ void Channel::addMode(char mode) {
 void Channel::removeMode(char mode) {
 	_modes.erase(mode);
 }
+
+const bool Channel::hasMode(char mode) const {
+	return _modes.find(mode) != std::string::npos;
+}

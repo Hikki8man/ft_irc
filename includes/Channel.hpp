@@ -5,13 +5,13 @@
 #include <iostream>
 #include "Client.hpp"
 
-#define SECRET "s"
-#define PROTECTED_TOPIC "t"
-#define NO_EXTERNAL_MESSAGES "n"
-#define INVITE "i"
-#define KEY "k"
-#define LIMIT "l"
-#define MODERATED "m"
+#define SECRET 's'
+#define PROTECTED_TOPIC 't'
+#define NO_EXTERNAL_MESSAGES 'n'
+#define INVITE 'i'
+#define KEY 'k'
+#define LIMIT 'l'
+#define MODERATED 'm'
 
 class Client;
 
@@ -46,6 +46,7 @@ class Channel {
 
 		void addMode(char mode);
 		void removeMode(char mode);
+		const bool hasMode(char mode) const;
 		
 	private:
 		std::string 				_name, _key;
