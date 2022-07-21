@@ -62,6 +62,7 @@ class Server {
 		void send_err_passwdmismatch(const Client&);
 		void send_err_unknowncommand(const Client&, const std::string&);
 		void send_err_chanoprivsneeded(const Client&, const std::string&);
+		void send_err_unknownmode(const Client&, const char);
 
 		std::map<std::string, Channel>& getChannels();
 		std::map<SOCKET, Client>& getClients();

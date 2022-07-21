@@ -29,11 +29,16 @@ void ModeCommand::execute(const Command& cmd, Client& sender) {
         }
 
         bool remove = modes.at(0) == '-';
+        std::string validModes = "stniklm";
 
         std::cout << "remove: " << remove << std::endl;
-
+        
         for (int i = 1; i < modes.size(); i++) {
             char mode = modes.at(i);
+            if (validModes.find(mode) == std::string::npos) {
+                Irc::getInstance().getServer()->send_err_unknownmode(sender, mode);
+                continue;
+            }
             Channel::Mode modeId = channel.getModeById(mode);
             std::vector<Channel::Mode>::iterator elem = std::find(channel.getModes().begin(), channel.getModes().end(), modeId);
             if (remove) {
