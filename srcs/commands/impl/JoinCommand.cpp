@@ -32,6 +32,7 @@ void JoinCommand::execute(const Command& cmd, Client& sender)
 				newChannel.setKey(keysList.front());
 				keysList.erase(keysList.begin());
 			}
+			sender.addChannel(newChannel);
 		}
 		else {
 			// add client to channel
@@ -42,6 +43,7 @@ void JoinCommand::execute(const Command& cmd, Client& sender)
 			else {
 				channel->second.addClient(sender);
 			}
+			sender.addChannel(channel->second);
 		}
 	}	
 }

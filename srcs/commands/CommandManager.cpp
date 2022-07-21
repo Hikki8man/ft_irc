@@ -7,6 +7,7 @@
 #include "commands/impl/PrivmsgCommand.hpp"
 #include "commands/impl/PingCommand.hpp"
 #include "commands/impl/PassCommand.hpp"
+#include "commands/impl/NoticeCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -17,6 +18,7 @@ CommandManager::CommandManager()
 	addCommand("PRIVMSG", new PrivmsgCommand());
 	addCommand("PING", new PingCommand());
 	addCommand("PASS", new PassCommand());
+	addCommand("NOTICE", new NoticeCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)

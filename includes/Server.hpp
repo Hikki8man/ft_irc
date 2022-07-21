@@ -40,9 +40,11 @@ class Server {
 		void send_join(const Client&, const Client&, const Channel&);
 		void send_part(const Client&, const Client&, const Channel&, const std::string&);
 		void send_privmsg(const Client&, const Client&, const std::string&, const std::string&);
+		void send_notice(const std::string&, const Client&, const std::string&, const std::string&);
 		void send_rpl_welcome(const Client&);
 		void send_rpl_namreply(const Client&, const Channel&);
 		void send_rpl_endofnames(const Client&, const Channel&);
+		void send_error(const Client&, const std::string&);
 
 		// Send Error Reply to client
 		void send_err_nosuchnick(const Client&, const std::string&);
@@ -63,7 +65,7 @@ class Server {
 
 		std::map<std::string, Channel>& getChannels();
 		std::map<SOCKET, Client>& getClients();
-		Client& getClient(const std::string&);
+		Client& findClientByName(const std::string&);
 		std::vector<pollfd>& getPollfds();
 		const std::string getPrefix() const;
 		const std::string getIp() const;
