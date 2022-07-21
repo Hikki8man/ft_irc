@@ -41,7 +41,7 @@ std::map<SOCKET, Client>& Server::getClients() {
 	return _clients;
 }
 
-Client &Server::getClient(const std::string& nick) {
+Client &Server::findClientByName(const std::string& nick) {
 	for (ClientIt it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->second.getNickname() == nick)
 			return it->second;
@@ -79,8 +79,7 @@ void Server::do_cmd(Client& sender) {
 
 		if (executor) {
 			if (cmd.getName() != "PASS" && !sender.isLogged() && getPassword().length() > 0) {
-				std::string msg = "Please use PASS before doing anything else" + std::string(CRLF);
-				send(sender.getSocket(), msg.c_str(), msg.size(), 0);
+				send_notice(getPrefix(), sender,"PASS", "You need to identify with PASS command first.");
 			}
 			else if (executor->isRegisteredOnly() && !sender.isRegistered())
 				Irc::getInstance().getServer()->send_err_notregistered(sender);

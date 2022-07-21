@@ -45,6 +45,29 @@ void Server::send_privmsg(const Client& sender, const Client& receiver, const st
 	}
 }
 
+// ========== NOTICE ==========
+void Server::send_notice(const std::string& prefix, const Client& receiver, const std::string& name, const std::string& msg) {
+	if (receiver.getPollfd().revents & POLLOUT) {
+		std::string n(name);
+		if (name.empty())
+			n = "*";
+		std::string msg_to_send = prefix + " NOTICE " + name + " :" + msg + CRLF;
+		int ret = send(receiver.getSocket(), msg_to_send.c_str(), msg_to_send.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending NOTICE message to client" << std::endl;
+	}
+}
+
+// ========== ERROR ==========
+void Server::send_error(const Client& client, const std::string& msg) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg_to_send = "ERROR :" + msg + CRLF;
+		int ret = send(client.getSocket(), msg_to_send.c_str(), msg_to_send.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending ERROR message to client" << std::endl;
+	}
+}
+
 // ========== RPL_NAMREPLY (353) ==========
 void  Server::send_rpl_namreply(const Client& client, const Channel& chan) {
 	if (client.getPollfd().revents & POLLOUT) {

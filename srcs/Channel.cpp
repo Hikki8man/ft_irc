@@ -11,6 +11,7 @@ Channel::Channel(const Channel& other) {
 Channel& Channel::operator=(const Channel& other) {
 	if (this != &other) {
 		_name = other._name;
+		_key = other._key;
 		_clients = other._clients;
 	}
 	return *this;
@@ -42,7 +43,7 @@ const Channel::ClientAndMod &Channel::getClientAndMod(const std::string& nick) c
 	return _clients.begin()->second;
 }
 
-const Client &Channel::getClient(const std::string& nick) const {
+const Client &Channel::findClientByName(const std::string& nick) const {
 	for (std::map<int, Channel::ClientAndMod>::const_iterator it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->second.client.getNickname() == nick)
 			return it->second.client;

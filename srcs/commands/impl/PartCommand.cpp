@@ -26,6 +26,7 @@ void PartCommand::execute(const Command& cmd, Client& sender)
 		}
 		else {
 			channel->second.removeClient(sender, reason);
+			sender.removeChannel(channel->second);
 			if (channel->second.getClients().empty())
 				Irc::getInstance().getServer()->getChannels().erase(channel);
 		}

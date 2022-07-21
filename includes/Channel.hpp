@@ -31,7 +31,7 @@ class Channel {
 		const std::string getName() const;
 		const std::string getKey() const;
 		const std::map<int, ClientAndMod>& getClients() const;
-		const Client &getClient(const std::string& nick) const;
+		const Client &findClientByName(const std::string& nick) const;
 		const ClientAndMod &getClientAndMod(const std::string& nick) const;
 		const std::string getModeString() const;
 		std::vector<Mode> getModes() const;

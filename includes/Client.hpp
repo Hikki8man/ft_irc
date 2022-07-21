@@ -10,6 +10,8 @@
 
 #define SOCKET int
 
+class Channel;
+
 class Client {
 	public:
 		Client();
@@ -26,6 +28,7 @@ class Client {
 		const pollfd& getPollfd() const;
 		std::string& getBuffer();
 		const std::string getPrefix() const;
+		const std::map<std::string, const Channel&>& getChannels() const;
 		const bool isLogged() const;
 
 		void setNickname(const std::string& nick);
@@ -36,6 +39,8 @@ class Client {
 		void setRegistered(bool);
 		void setLogged(bool);
 
+		void addChannel(const Channel& channel);
+		void removeChannel(const Channel& channel);
 		bool isRegistered() const;
 
 	private:
@@ -44,6 +49,7 @@ class Client {
 		SOCKET _socket;
 		struct sockaddr_in _addr;
 
+		std::map<std::string, const Channel&> _channels;
 		std::string _nick, _user, _realName, _bufferStocked, _prefix;
 };
 

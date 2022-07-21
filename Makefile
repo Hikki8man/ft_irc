@@ -49,6 +49,7 @@ SRCS 		+=	Command.cpp \
 				PrivmsgCommand.cpp \
 				PingCommand.cpp \
 				PassCommand.cpp \
+				NoticeCommand.cpp \
 				ModeCommand.cpp \
 
 #===============================#

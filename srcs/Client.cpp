@@ -62,6 +62,9 @@ const std::string Client::getPrefix() const {
 	return _prefix;
 }
 
+const std::map<std::string, const Channel&>& Client::getChannels() const {
+	return _channels;
+}
 
 // SETTERS
 void Client::setNickname(const std::string& nick) {
@@ -88,6 +91,7 @@ void Client::setPrefix() {
 	_prefix = ":" + _nick + "!" + _user + "@" + inet_ntoa(_addr.sin_addr);
 }
 
+// Methods
 
 bool Client::isRegistered() const {
 	return _registered && isLogged();
@@ -99,4 +103,12 @@ void Client::setLogged(bool logged) {
 
 const bool Client::isLogged() const {
 	return _logged || Irc::getInstance().getServer()->getPassword().length() == 0;
+}
+
+void Client::addChannel(const Channel& channel) {
+	_channels.insert(std::make_pair(channel.getName(), channel));
+}
+
+void Client::removeChannel(const Channel& channel) {
+	_channels.erase(channel.getName());
 }
