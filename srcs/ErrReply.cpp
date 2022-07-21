@@ -131,3 +131,12 @@ void Server::send_err_unknowncommand(const Client& client, const std::string& co
 		send(client.getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
+
+// ========== ERR_CHANOPRIVSNEEDED (482) ==========
+
+void Server::send_err_chanoprivsneeded(const Client& client, const std::string& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 482 " + client.getNickname() + " " + channel + " :You're not channel operator" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}

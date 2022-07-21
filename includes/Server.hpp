@@ -43,6 +43,7 @@ class Server {
 		void send_rpl_welcome(const Client&);
 		void send_rpl_namreply(const Client&, const Channel&);
 		void send_rpl_endofnames(const Client&, const Channel&);
+		void send_rpl_channelmodeis(const Client&, const Channel&);
 
 		// Send Error Reply to client
 		void send_err_nosuchnick(const Client&, const std::string&);
@@ -60,6 +61,7 @@ class Server {
 		void send_err_notregistered(const Client&);
 		void send_err_passwdmismatch(const Client&);
 		void send_err_unknowncommand(const Client&, const std::string&);
+		void send_err_chanoprivsneeded(const Client&, const std::string&);
 
 		std::map<std::string, Channel>& getChannels();
 		std::map<SOCKET, Client>& getClients();
