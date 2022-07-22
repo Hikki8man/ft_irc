@@ -1,8 +1,8 @@
 #include "../includes/Channel.hpp"
 
-Channel::Channel() : _name(""), _modes("") {}
+Channel::Channel() : _name(""), _modes(""), _limit(0) {}
 
-Channel::Channel(const std::string& name) : _name(name) {}
+Channel::Channel(const std::string& name) : _name(name), _modes(""), _limit(0) {}
 
 Channel::Channel(const Channel& other) {
 	*this = other;
@@ -55,6 +55,9 @@ std::string Channel::getModes() const {
 	return _modes;
 }
 
+const int Channel::getLimit() const {
+	return _limit;
+}
 
 // setters
 void Channel::setName(const std::string& name) {
@@ -65,14 +68,20 @@ void Channel::setKey(const std::string& key) {
 	_key = key;
 }
 
+void Channel::setLimit(const int limit) {
+	_limit = limit;
+}
+
 void Channel::addClient(const Client& client, const std::string& key) {
 	// Check if the client is already in the channel
 	std::cout << "Channel: " << _name << " Key: " << _key << std::endl;
-	if (_clients.find(client.getSocket()) != _clients.end()) {
+	if (_clients.find(client.getSocket()) != _clients.end())
 		return;
-	}
 	else if (_key != key) {
 		Irc::getInstance().getServer()->send_err_badchannelkey(client, _name);
+		return;
+	} else if (hasMode(LIMIT) && _clients.size() >= _limit) {
+		Irc::getInstance().getServer()->send_err_channelisfull(client, _name);
 		return;
 	}
 	if (_clients.empty())
@@ -96,7 +105,7 @@ void Channel::addMode(char mode) {
 }
 
 void Channel::removeMode(char mode) {
-	_modes.erase(mode);
+	_modes.erase(_modes.find(mode), 1);
 }
 
 const bool Channel::hasMode(char mode) const {

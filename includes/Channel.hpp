@@ -33,9 +33,11 @@ class Channel {
 		
 		void setName(const std::string& name);
 		void setKey(const std::string& key);
+		void setLimit(const int limit);
 
 		const std::string getName() const;
 		const std::string getKey() const;
+		const int getLimit() const;
 		const std::map<int, ClientAndMod>& getClients() const;
 		const Client &findClientByName(const std::string& nick) const;
 		const ClientAndMod &getClientAndMod(const std::string& nick) const;
@@ -52,6 +54,7 @@ class Channel {
 		std::string 				_name, _key;
 		std::map<int, ClientAndMod>	_clients;
 		std::string					_modes;
+		int							_limit;
 };
 
 #endif

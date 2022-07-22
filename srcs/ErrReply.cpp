@@ -149,3 +149,12 @@ void Server::send_err_unknownmode(const Client& client, const char mode) {
 		send(client.getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
+
+// ========== ERR_CHANNELISFULL (471) ==========
+
+void Server::send_err_channelisfull(const Client& client, const std::string& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 471 " + client.getNickname() + " " + channel + " :Cannot join channel (+l)" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}

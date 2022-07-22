@@ -22,8 +22,8 @@ void PrivmsgCommand::execute(const Command& cmd, Client& sender) {
 				continue;
 			}
 			Channel& channel = Irc::getInstance().getServer()->getChannels().find(*targetIt)->second;
-			// if client is not in the channel, send error
-			if (channel.findClientByName(sender.getNickname()).getNickname() != sender.getNickname()) {
+			// if client is not in the channel ans channel has no external messages mode enabled, send error
+			if (channel.findClientByName(sender.getNickname()).getNickname() != sender.getNickname() && channel.hasMode(NO_EXTERNAL_MESSAGES)) {
 				Irc::getInstance().getServer()->send_err_cannotsendtochan(sender, *targetIt);
 				continue;
 			}
