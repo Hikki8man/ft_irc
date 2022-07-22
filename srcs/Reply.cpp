@@ -71,16 +71,11 @@ void Server::send_notice(const std::string& prefix, const Client& receiver, cons
 // ========== ERROR ==========
 void Server::send_error(const Client& client, const std::string& msg) {
 	if (client.getPollfd().revents & POLLOUT) {
-		std::string msg_to_send = "ERROR :" + msg + CRLF;
+		std::string msg_to_send = "ERROR :Closing Link: " + client.getIp() + " (" + msg + ")" + CRLF;
 		int ret = send(client.getSocket(), msg_to_send.c_str(), msg_to_send.size(), 0);
 		if (ret == -1)
 			std::cerr << "Error while sending ERROR message to client" << std::endl;
-		for (std::vector<pollfd>::iterator it = Irc::getInstance().getServer()->getPollfds().begin(); it != Irc::getInstance().getServer()->getPollfds().end(); ++it) {
-			if (it->fd == client.getSocket()) {
-				close(client.getSocket());
-				break;
-			}
-		}
+		close(client.getSocket());
 	}
 }
 

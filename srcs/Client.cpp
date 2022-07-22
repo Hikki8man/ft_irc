@@ -20,6 +20,7 @@ Client& Client::operator=(const Client& other) {
 		_registered = other._registered;
 		_channels = other._channels;
 		_prefix = other._prefix;
+		_ip = other._ip;
 	}
 	return *this;
 }
@@ -68,6 +69,10 @@ std::map<std::string, const Channel&>& Client::getChannels() {
 	return _channels;
 }
 
+const std::string Client::getIp() const {
+	return _ip;
+}
+
 // SETTERS
 void Client::setNickname(const std::string& nick) {
 	_nick = nick;
@@ -90,7 +95,11 @@ void Client::setRegistered(bool registered) {
 }
 
 void Client::setPrefix() {
-	_prefix = ":" + _nick + "!" + _user + "@" + inet_ntoa(_addr.sin_addr);
+	_prefix = ":" + _nick + "!" + _user + "@" + getIp();
+}
+
+void Client::setIp(const std::string& ip) {
+	_ip = ip;
 }
 
 // Methods

@@ -169,12 +169,14 @@ int Server::newConnection() {
 	newSocket.events = POLLIN | POLLOUT;
 	_sockets.push_back(newSocket);
 
-	std::cout << inet_ntoa(client_addr.sin_addr) << " connected" << std::endl;
 	
 
-	// Add new client to clients list, hummmm
+	// Add new client to clients list
 	Client newClient(new_socket, client_addr);
+	newClient.setIp(inet_ntoa(client_addr.sin_addr));
 	_clients[new_socket] = newClient;
+
+	std::cout << newClient.getIp() << " connected" << std::endl;
 
 	return 0;
 }
@@ -191,7 +193,7 @@ int Server::recvMsgFrom(SocketIt socket) {
 	}
 	if (n == 0) {
 		// need to remove client from clients list of channels
-		std::cout << sender.getNickname() << " disconnected" << std::endl;
+		std::cout << sender.getIp() << " disconnected" << std::endl;
 		Command cmd(sender);
 		sender.getBuffer().clear();
 		sender.setBuffer("QUIT :Remote host closed the connection\r\n");

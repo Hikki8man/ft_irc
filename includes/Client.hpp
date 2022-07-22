@@ -28,6 +28,7 @@ class Client {
 		const pollfd& getPollfd() const;
 		std::string& getBuffer();
 		const std::string getPrefix() const;
+		const std::string getIp() const;
 		std::map<std::string, const Channel&>& getChannels();
 		const bool isLogged() const;
 
@@ -38,6 +39,7 @@ class Client {
 		void setPrefix();
 		void setRegistered(bool);
 		void setLogged(bool);
+		void setIp(const std::string& ip);
 
 		void addChannel(const Channel& channel);
 		void removeChannel(Channel& channel);
@@ -50,7 +52,7 @@ class Client {
 		struct sockaddr_in _addr;
 
 		std::map<std::string, const Channel&> _channels;
-		std::string _nick, _user, _realName, _bufferStocked, _prefix;
+		std::string _nick, _user, _realName, _bufferStocked, _prefix, _ip;
 };
 
 #endif

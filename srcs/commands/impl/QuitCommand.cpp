@@ -28,6 +28,6 @@ void QuitCommand::execute(const Command& cmd, Client& sender)
 		Irc::getInstance().getServer()->send_quit(sender, it->second, reason);
 	}
 	sender.getChannels().clear();
-	Irc::getInstance().getServer()->getClients().erase(sender.getSocket());
 	Irc::getInstance().getServer()->send_error(sender, reason);
+	Irc::getInstance().getServer()->getClients().erase(sender.getSocket());
 }
