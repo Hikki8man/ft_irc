@@ -13,17 +13,12 @@
 #define LIMIT 'l'
 #define MODERATED 'm'
 
+#define SOCKET int
+
 class Client;
 
 class Channel {
 	public:
-
-		struct ClientAndMod {
-			ClientAndMod(const Client&, char);
-
-			const Client &client;
-			char mod;
-		};
 		
 		Channel();
 		Channel(const std::string& name);
@@ -38,12 +33,12 @@ class Channel {
 		const std::string getName() const;
 		const std::string getKey() const;
 		const int getLimit() const;
-		const std::map<int, ClientAndMod>& getClients() const;
-		const Client &findClientByName(const std::string& nick) const;
-		const ClientAndMod &getClientAndMod(const std::string& nick) const;
+		std::map<SOCKET, char>& getClientsAndMod();
+		// const Client &findClientByName(const std::string& nick) const;
+		// const ClientAndMod &getClientAndMod(const std::string& nick) const;
 		std::string getModes() const;
 		
-		void addClient(const Client&, const std::string& key = "");
+		void addClient(Client&, const std::string& key = "");
 		void removePartClient(const Client&, const std::string& reason = "");
 		void removeQuitClient(const Client&);
 
@@ -53,7 +48,7 @@ class Channel {
 		
 	private:
 		std::string 				_name, _key;
-		std::map<int, ClientAndMod>	_clients;
+		std::map<SOCKET, char>	_clientsAndMod;
 		std::string					_modes;
 		int							_limit;
 };

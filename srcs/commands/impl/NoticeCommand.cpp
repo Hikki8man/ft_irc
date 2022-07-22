@@ -15,22 +15,22 @@ void NoticeCommand::execute(const Command& cmd, Client& sender) {
 				continue;
 			}
 			Channel& channel = Irc::getInstance().getServer()->getChannels().find(*targetIt)->second;
-			if (channel.findClientByName(sender.getNickname()).getNickname() != sender.getNickname()) {
+			if (!sender.isInChannel(channel) && channel.hasMode(NO_EXTERNAL_MESSAGES)) {
 				continue;
 			}
-			for (std::map<int, Channel::ClientAndMod>::const_iterator clientIt = channel.getClients().begin(); clientIt != channel.getClients().end(); ++clientIt) {
-				if (clientIt->second.client.getNickname() != sender.getNickname()) {
-					Irc::getInstance().getServer()->send_notice(sender.getPrefix(), clientIt->second.client, *targetIt, args[1]);
+			for (std::map<int, char>::const_iterator clientIt = channel.getClientsAndMod().begin(); clientIt != channel.getClientsAndMod().end(); ++clientIt) {
+				if (clientIt->first != sender.getSocket()) {
+					std::string msg = "NOTICE " + channel.getName() + " :" + args[1];
+					sender.sendMessage(clientIt->first, msg);
 				}
 			}
 		}
 		// if the target is a user
 		else {
-			if (Irc::getInstance().getServer()->nickIsUsed(*targetIt) == false) {
-				Irc::getInstance().getServer()->send_err_nosuchnick(sender, *targetIt);
+			if (Irc::getInstance().getServer()->nickIsUsed(*targetIt)) {
+				std::string msg = "NOTICE " + *targetIt + " :" + args[1];
+				sender.sendMessage(Irc::getInstance().getServer()->findClientByName(*targetIt), msg);
 			}
-			else // try notice the user
-				Irc::getInstance().getServer()->send_notice(sender.getPrefix(), Irc::getInstance().getServer()->findClientByName(*targetIt), *targetIt, args[1]);
 		}
 	}
 }

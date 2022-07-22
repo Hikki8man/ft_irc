@@ -46,6 +46,9 @@ class Client {
 		const bool isLogged() const;
 		bool isInChannel(const Channel& channel) const;
 
+		void sendMessage(int toSend, const std::string& message, bool prefix = true) const;
+		void sendMessage(Client &toSend, const std::string& message, bool prefix = true) const;
+
 	private:
 		bool _registered;
 		bool _logged;

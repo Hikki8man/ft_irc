@@ -23,7 +23,7 @@ void ModeCommand::execute(const Command& cmd, Client& sender) {
         Channel* channel = &Irc::getInstance().getServer()->getChannels()[target];
         std::string modes = args[1];
 
-        if (channel->getClientAndMod(sender.getNickname()).mod != '@') {
+        if (channel->getClientsAndMod()[sender.getSocket()] != '@') {
             Irc::getInstance().getServer()->send_err_chanoprivsneeded(sender, target);
             return;
         }

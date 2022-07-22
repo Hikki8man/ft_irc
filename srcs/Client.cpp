@@ -128,3 +128,28 @@ void Client::addChannel(const Channel& channel) {
 void Client::removeChannel(Channel& channel) {
 	_channels.erase(channel.getName());
 }
+
+void Client::sendMessage(int toSend, const std::string& args, bool prefix) const {
+	Client& toSendTo = Irc::getInstance().getServer()->getClientBySocket(toSend);
+	if (toSendTo.getPollfd().revents & POLLOUT) {
+		std::string msg;
+		if (prefix == true)
+			msg = getPrefix() + " ";
+		msg += args + CRLF;
+		int ret = send(toSendTo.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending " << msg.substr(0, msg.find_first_of(" ")) << " message to " << toSendTo.getIp() << std::endl;
+	}
+}
+
+void Client::sendMessage(Client &toSendTo, const std::string& args, bool prefix) const {
+	if (toSendTo.getPollfd().revents & POLLOUT) {
+		std::string msg;
+		if (prefix == true)
+			msg = getPrefix() + " ";
+		msg += args + CRLF;
+		int ret = send(toSendTo.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending " << msg.substr(0, msg.find_first_of(" ")) << " message to " << toSendTo.getIp() << std::endl;
+	}
+}

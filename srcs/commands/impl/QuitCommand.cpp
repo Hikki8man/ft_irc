@@ -12,22 +12,24 @@ void QuitCommand::execute(const Command& cmd, Client& sender)
 	std::string reason = "Client Quit";
 	if (!args.empty())
 		reason = args[0];
-	std::map<std::string, Client> clientToSendQuit;
+	std::map<SOCKET, int> clientToSendQuit;
 	for (std::map<std::string, const Channel &>::iterator it = sender.getChannels().begin(); it != sender.getChannels().end(); ++it) {
 		std::map<std::string, Channel>::iterator channel = Irc::getInstance().getServer()->getChannels().find(it->first);
-		for (std::map<int, Channel::ClientAndMod>::const_iterator clientIt = channel->second.getClients().begin(); clientIt != channel->second.getClients().end(); ++clientIt) {
-			if (clientIt->second.client.getNickname() != sender.getNickname()) {
-				clientToSendQuit.insert(std::make_pair(clientIt->second.client.getNickname(), clientIt->second.client));
+		for (std::map<int, char>::const_iterator clientIt = channel->second.getClientsAndMod().begin(); clientIt != channel->second.getClientsAndMod().end(); ++clientIt) {
+			if (clientIt->first != sender.getSocket()) {
+				clientToSendQuit[clientIt->first];
 			}
 		}
 		channel->second.removeQuitClient(sender);
-		if (channel->second.getClients().empty())
+		if (channel->second.getClientsAndMod().empty())
 			Irc::getInstance().getServer()->getChannels().erase(channel);
 	}
-	for (std::map<std::string, Client>::iterator it = clientToSendQuit.begin(); it != clientToSendQuit.end(); ++it) {
-		Irc::getInstance().getServer()->send_quit(sender, it->second, reason);
+	for (std::map<SOCKET, int>::iterator it = clientToSendQuit.begin(); it != clientToSendQuit.end(); ++it) {
+		std::string msg = "QUIT :" + reason;
+		sender.sendMessage(it->first, msg);
 	}
-	sender.getChannels().clear();
-	Irc::getInstance().getServer()->send_error(sender, reason);
+	std::string msg_to_send = "ERROR :Closing Link: " + sender.getIp() + " (" + reason + ")";
+	sender.sendMessage(sender, msg_to_send, false);
 	Irc::getInstance().getServer()->getClients().erase(sender.getSocket());
+	close(sender.getSocket());
 }

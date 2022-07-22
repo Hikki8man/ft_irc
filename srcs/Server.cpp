@@ -49,12 +49,23 @@ Client &Server::findClientByName(const std::string& nick) {
 	return _clients.begin()->second;
 }
 
+Client &Server::getClientBySocket(SOCKET socket) {
+	std::map<int, Client>::iterator client = _clients.find(socket);
+	if (client == _clients.end())
+		return _clients.begin()->second;
+	return client->second;
+}
+
 const std::string Server::getIp() const {
 	return _srv_ip;
 }
 
 const std::string Server::getPassword() const {
 	return _password;
+}
+
+const SOCKET Server::getSocket() const {
+	return _srv_fd;
 }
 
 // Setter ===========================================================================
@@ -69,17 +80,42 @@ void Server::setPassword(const std::string& password) {
 
 // Methods ==========================================================================
 
+void Server::sendMessage(int toSend, const std::string& args, bool prefix) const {
+	Client& toSendTo = Irc::getInstance().getServer()->getClientBySocket(toSend);
+	if (toSendTo.getPollfd().revents & POLLOUT) {
+		std::string msg;
+		if (prefix == true)
+			msg = getPrefix() + " ";
+		msg += args + CRLF;
+		int ret = send(toSendTo.getSocket(), msg.c_str(), msg.length(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending message to " << toSendTo.getNickname() << std::endl;
+	}
+}
+
+void Server::sendMessage(Client &toSendTo, const std::string& args, bool prefix) const {
+	if (toSendTo.getPollfd().revents & POLLOUT) {
+		std::string msg;
+		if (prefix == true)
+			msg = getPrefix() + " ";
+		msg += args + CRLF;
+		int ret = send(toSendTo.getSocket(), msg.c_str(), msg.length(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending message to " << toSendTo.getNickname() << std::endl;
+	}
+}
+
 void Server::do_cmd(Client& sender) {
 
 	std::cout << "msg received: " << sender.getBuffer() << std::endl;
 	while (sender.getBuffer().find("\r\n") != std::string::npos) {
 
-		Command cmd(sender);
+		Command cmd;
 		CommandExecutor *executor = cmd.parse(sender.getBuffer());
 
 		if (executor) {
 			if (cmd.getName() != "PASS" && cmd.getName() != "QUIT" && !sender.isLogged() && getPassword().length() > 0) {
-				send_notice(getPrefix(), sender,"PASS", "You need to identify with PASS command first.");
+				sendMessage(sender, "NOTICE PASS :You need to identify with PASS command first.");
 			}
 			else if (executor->isRegisteredOnly() && !sender.isRegistered())
 				Irc::getInstance().getServer()->send_err_notregistered(sender);
@@ -194,13 +230,11 @@ int Server::recvMsgFrom(SocketIt socket) {
 	if (n == 0) {
 		// need to remove client from clients list of channels
 		std::cout << sender.getIp() << " disconnected" << std::endl;
-		Command cmd(sender);
+		Command cmd;
 		sender.getBuffer().clear();
 		sender.setBuffer("QUIT :Remote host closed the connection\r\n");
 		CommandExecutor *executor = cmd.parse(sender.getBuffer());
 		executor->execute(cmd, sender);
-		close(socket->fd);
-		_clients.erase(socket->fd);
 		_sockets.erase(socket);
 		return 0;
 	}
