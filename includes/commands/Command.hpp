@@ -17,12 +17,10 @@ class Command {
 
 	public:
 		Command();
-		Command(const std::string& toParse);
 		Command(const std::string& name, const std::vector<std::string>& args);
 
 		const std::string& getName() const;
 		const std::vector<std::string>& getArgs() const;
-		const Client& getSender() const;
 		CommandExecutor *getExecutor() const;
 
 		CommandExecutor *parse(std::string& buffer);

@@ -75,7 +75,7 @@ class Server {
 
 		std::map<std::string, Channel>& getChannels();
 		std::map<SOCKET, Client>& getClients();
-		Client& findClientByName(const std::string&);//TODO: remove??
+		Client& findClientByName(const std::string&);
 		Client& getClientBySocket(SOCKET socket);
 		std::vector<pollfd>& getPollfds();
 		const std::string getPrefix() const;

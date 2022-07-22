@@ -2,11 +2,6 @@
 
 Command::Command() : _executor(NULL) {}
 
-Command::Command(const std::string& toParse) {
-	std::string buffer = toParse;
-	_executor = parse(buffer);
-}
-
 Command::Command(const std::string& name, const std::vector<std::string>& args) : _name(name), _args(args) {}
 
 const std::vector<std::string>& Command::getArgs() const {
