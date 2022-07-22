@@ -116,6 +116,10 @@ const bool Client::isLogged() const {
 	return _logged || Irc::getInstance().getServer()->getPassword().length() == 0;
 }
 
+bool Client::isInChannel(const Channel& channel) const {
+	return _channels.find(channel.getName()) != _channels.end();
+}
+
 void Client::addChannel(const Channel& channel) {
 	_channels.insert(std::make_pair(channel.getName(), channel));
 	// _channels[channel.getName()] = channel;

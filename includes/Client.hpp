@@ -30,7 +30,6 @@ class Client {
 		const std::string getPrefix() const;
 		const std::string getIp() const;
 		std::map<std::string, const Channel&>& getChannels();
-		const bool isLogged() const;
 
 		void setNickname(const std::string& nick);
 		void setUsername(const std::string& user);
@@ -44,6 +43,8 @@ class Client {
 		void addChannel(const Channel& channel);
 		void removeChannel(Channel& channel);
 		bool isRegistered() const;
+		const bool isLogged() const;
+		bool isInChannel(const Channel& channel) const;
 
 	private:
 		bool _registered;
