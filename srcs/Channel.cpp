@@ -74,7 +74,6 @@ void Channel::setLimit(const int limit) {
 
 void Channel::addClient(const Client& client, const std::string& key) {
 	// Check if the client is already in the channel
-	std::cout << "Channel: " << _name << " Key: " << _key << std::endl;
 	if (_clients.find(client.getSocket()) != _clients.end())
 		return;
 	else if (_key != key) {
@@ -94,9 +93,13 @@ void Channel::addClient(const Client& client, const std::string& key) {
 	Irc::getInstance().getServer()->send_rpl_endofnames(client, *this);
 }
 
-void Channel::removeClient(const Client& client, const std::string& reason) {
+void Channel::removePartClient(const Client& client, const std::string& reason) {
 	for (std::map<int, ClientAndMod>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 			Irc::getInstance().getServer()->send_part(it->second.client, client, *this, reason);
+	_clients.erase(client.getSocket());
+}
+
+void Channel::removeQuitClient(const Client& client) {
 	_clients.erase(client.getSocket());
 }
 

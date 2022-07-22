@@ -78,7 +78,7 @@ void Server::do_cmd(Client& sender) {
 		CommandExecutor *executor = cmd.parse(sender.getBuffer());
 
 		if (executor) {
-			if (cmd.getName() != "PASS" && !sender.isLogged() && getPassword().length() > 0) {
+			if (cmd.getName() != "PASS" && cmd.getName() != "QUIT" && !sender.isLogged() && getPassword().length() > 0) {
 				send_notice(getPrefix(), sender,"PASS", "You need to identify with PASS command first.");
 			}
 			else if (executor->isRegisteredOnly() && !sender.isRegistered())
@@ -184,14 +184,20 @@ int Server::recvMsgFrom(SocketIt socket) {
 	Client& sender = _clients[socket->fd];
 	int n;
 	if ((n = recv(socket->fd, buffer, BUFFER_MAX, 0)) < 0) {
-		// _clients.erase(socket->fd);
-		// _sockets.erase(socket); ??
+		_clients.erase(socket->fd);
+		_sockets.erase(socket);
 		perror("recv");
-		return 1;
+		return 0;
 	}
 	if (n == 0) {
 		// need to remove client from clients list of channels
 		std::cout << sender.getNickname() << " disconnected" << std::endl;
+		Command cmd(sender);
+		sender.getBuffer().clear();
+		sender.setBuffer("QUIT :Remote host closed the connection\r\n");
+		CommandExecutor *executor = cmd.parse(sender.getBuffer());
+		executor->execute(cmd, sender);
+		close(socket->fd);
 		_clients.erase(socket->fd);
 		_sockets.erase(socket);
 		return 0;
@@ -215,6 +221,10 @@ int Server::run(int port) {
 		}
 		else if (pollRet > 0) {
 			for (SocketIt it = _sockets.begin(); it != _sockets.end(); ++it) {
+				if (it->fd != _srv_fd && _clients.find(it->fd) == _clients.end()) {
+					_sockets.erase(it);
+					break;
+				}
 				if (it->revents & POLLIN) {
 					if (it->fd == _srv_fd) {
 						newConnection();

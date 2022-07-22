@@ -44,7 +44,8 @@ class Channel {
 		std::string getModes() const;
 		
 		void addClient(const Client&, const std::string& key = "");
-		void removeClient(const Client&, const std::string& reason = "");
+		void removePartClient(const Client&, const std::string& reason = "");
+		void removeQuitClient(const Client&);
 
 		void addMode(char mode);
 		void removeMode(char mode);

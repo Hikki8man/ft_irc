@@ -28,7 +28,7 @@ class Client {
 		const pollfd& getPollfd() const;
 		std::string& getBuffer();
 		const std::string getPrefix() const;
-		const std::map<std::string, const Channel&>& getChannels() const;
+		std::map<std::string, const Channel&>& getChannels();
 		const bool isLogged() const;
 
 		void setNickname(const std::string& nick);
@@ -40,7 +40,7 @@ class Client {
 		void setLogged(bool);
 
 		void addChannel(const Channel& channel);
-		void removeChannel(const Channel& channel);
+		void removeChannel(Channel& channel);
 		bool isRegistered() const;
 
 	private:

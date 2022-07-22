@@ -30,7 +30,7 @@ void NoticeCommand::execute(const Command& cmd, Client& sender) {
 				Irc::getInstance().getServer()->send_err_nosuchnick(sender, *targetIt);
 			}
 			else // try notice the user
-				Irc::getInstance().getServer()->send_privmsg(sender, Irc::getInstance().getServer()->findClientByName(*targetIt), *targetIt, args[1]);
+				Irc::getInstance().getServer()->send_notice(sender.getPrefix(), Irc::getInstance().getServer()->findClientByName(*targetIt), *targetIt, args[1]);
 		}
 	}
 }

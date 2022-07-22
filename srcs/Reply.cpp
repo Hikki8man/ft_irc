@@ -35,6 +35,16 @@ void Server::send_part(const Client& client, const Client& leaver, const Channel
 	}
 }
 
+// ========== QUIT ==========
+void Server::send_quit(const Client& client, const Client& reveiver, const std::string& reason) {
+	if (reveiver.getPollfd().revents & POLLOUT) {
+		std::string msg = client.getPrefix() + " QUIT :" + reason + CRLF;
+		int ret = send(reveiver.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending QUIT message to client" << std::endl;
+	}
+}
+
 // ========= PRIVMSG =========
 void Server::send_privmsg(const Client& sender, const Client& receiver, const std::string& name, const std::string& msg) {
 	if (receiver.getPollfd().revents & POLLOUT) {
@@ -65,6 +75,12 @@ void Server::send_error(const Client& client, const std::string& msg) {
 		int ret = send(client.getSocket(), msg_to_send.c_str(), msg_to_send.size(), 0);
 		if (ret == -1)
 			std::cerr << "Error while sending ERROR message to client" << std::endl;
+		for (std::vector<pollfd>::iterator it = Irc::getInstance().getServer()->getPollfds().begin(); it != Irc::getInstance().getServer()->getPollfds().end(); ++it) {
+			if (it->fd == client.getSocket()) {
+				close(client.getSocket());
+				break;
+			}
+		}
 	}
 }
 

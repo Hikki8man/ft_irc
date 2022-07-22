@@ -18,6 +18,8 @@ Client& Client::operator=(const Client& other) {
 		_addr = other._addr;
 		_bufferStocked = other._bufferStocked;
 		_registered = other._registered;
+		_channels = other._channels;
+		_prefix = other._prefix;
 	}
 	return *this;
 }
@@ -62,7 +64,7 @@ const std::string Client::getPrefix() const {
 	return _prefix;
 }
 
-const std::map<std::string, const Channel&>& Client::getChannels() const {
+std::map<std::string, const Channel&>& Client::getChannels() {
 	return _channels;
 }
 
@@ -107,8 +109,9 @@ const bool Client::isLogged() const {
 
 void Client::addChannel(const Channel& channel) {
 	_channels.insert(std::make_pair(channel.getName(), channel));
+	// _channels[channel.getName()] = channel;
 }
 
-void Client::removeChannel(const Channel& channel) {
+void Client::removeChannel(Channel& channel) {
 	_channels.erase(channel.getName());
 }

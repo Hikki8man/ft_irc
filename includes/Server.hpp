@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 #define SOCKET int
 #define SocketIt std::vector<pollfd>::iterator
@@ -39,6 +40,7 @@ class Server {
 		// Send Reply to client
 		void send_join(const Client&, const Client&, const Channel&);
 		void send_part(const Client&, const Client&, const Channel&, const std::string&);
+		void send_quit(const Client&, const Client&, const std::string&);
 		void send_privmsg(const Client&, const Client&, const std::string&, const std::string&);
 		void send_notice(const std::string&, const Client&, const std::string&, const std::string&);
 		void send_rpl_welcome(const Client&);
