@@ -138,22 +138,6 @@ void Server::send_rpl_endofnames(const Client& client, const Channel& chan) {
 	}
 }
 
-// ========== RPL_CHANNELMODEIS (324) ==========
-
-void Server::send_rpl_channelmodeis(const Client& client, const Channel& chan) {
-	if (client.getPollfd().revents & POLLOUT) {
-		std::string modesInfo = "";
-		if (chan.hasMode(LIMIT))
-			modesInfo += " " + std::to_string(chan.getLimit());
-		if (chan.hasMode(KEY))
-			modesInfo += " " + chan.getKey();
-		std::string msg = getPrefix() + " 324 " + client.getNickname() + " " + chan.getName() + " +" + chan.getModes() + modesInfo + CRLF;
-		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
-		if (ret == -1)
-			std::cerr << "Error while sending RPL_CHANNELMODEIS message to client" << std::endl;
-	}
-}
-
 // ========== RPL_ENDOFWHOIS (318) ==========
 
 void Server::send_rpl_endofwhois(const Client& client, const std::string& name) {

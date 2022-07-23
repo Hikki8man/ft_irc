@@ -146,7 +146,7 @@ void Channel::insertClient(std::pair<SOCKET, char> client) {
 
 void Channel::removeQuitClient(const Client& client) {
 	removeInvite(client);
-	_clientsAndMod.erase(client.getSocket());
+	_clientsAndMode.erase(client.getSocket());
 }
 
 void Channel::addMode(char mode) {
