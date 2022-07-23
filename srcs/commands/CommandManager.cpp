@@ -15,6 +15,7 @@
 #include "commands/impl/MotdCommand.hpp"
 #include "commands/impl/TimeCommand.hpp"
 #include "commands/impl/InviteCommand.hpp"
+#include "commands/impl/KickCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -33,6 +34,7 @@ CommandManager::CommandManager()
 	addCommand("MOTD", new MotdCommand());
 	addCommand("TIME", new TimeCommand());
 	addCommand("INVITE", new InviteCommand());
+	addCommand("KICK", new KickCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)

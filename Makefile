@@ -57,6 +57,7 @@ SRCS 		+=	Command.cpp \
 				MotdCommand.cpp \
 				TimeCommand.cpp \
 				InviteCommand.cpp \
+				KickCommand.cpp \
 
 #===============================#
 #            HEADERS            #
@@ -84,6 +85,7 @@ HEADERS		=	Irc.hpp \
 				MotdCommand.hpp \
 				TimeCommand.hpp \
 				InviteCommand.hpp \
+				KickCommand.hpp \
 
 #===============================#
 #            OBJECTS            #

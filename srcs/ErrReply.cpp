@@ -167,3 +167,12 @@ void Server::send_err_inviteonlychan(const Client& client, const std::string& ch
 		send(client.getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
+
+// ========== ERR_USERNOTINCHANNEL (442) ==========
+
+void Server::send_err_usernotinchannel(const Client& client, const std::string& nick, const std::string& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 442 " + client.getNickname() + " " + nick + " " + channel + " :They aren't on that channel" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
