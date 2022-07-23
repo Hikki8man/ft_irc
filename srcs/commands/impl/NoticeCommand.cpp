@@ -18,7 +18,7 @@ void NoticeCommand::execute(const Command& cmd, Client& sender) {
 			if (!sender.isInChannel(channel) && channel.hasMode(NO_EXTERNAL_MESSAGES)) {
 				continue;
 			}
-			for (std::map<int, char>::const_iterator clientIt = channel.getClientsAndMod().begin(); clientIt != channel.getClientsAndMod().end(); ++clientIt) {
+			for (std::map<int, char>::const_iterator clientIt = channel.getClientsAndMode().begin(); clientIt != channel.getClientsAndMode().end(); ++clientIt) {
 				if (clientIt->first != sender.getSocket()) {
 					std::string msg = "NOTICE " + channel.getName() + " :" + args[1];
 					sender.sendMessage(clientIt->first, msg);

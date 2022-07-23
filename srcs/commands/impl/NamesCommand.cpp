@@ -13,10 +13,10 @@ void NamesCommand::execute(const Command& cmd, Client& sender)
 		Channel privChannel("*");
 		for (std::map<int, Client>::iterator clientIt = Irc::getInstance().getServer()->getClients().begin(); clientIt != Irc::getInstance().getServer()->getClients().end(); ++clientIt) {
 			if (clientIt->second.getChannels().empty()) {
-				privChannel.getClientsAndMod().insert(std::pair<int, char>(clientIt->first, '\0'));
+				privChannel.insertClient(std::make_pair(clientIt->first, '\0'));
 			}
 		}
-		if (!privChannel.getClientsAndMod().empty())
+		if (!privChannel.getClientsAndMode().empty())
 			Irc::getInstance().getServer()->send_rpl_namreply(sender, privChannel);
 		Irc::getInstance().getServer()->send_rpl_endofnames(sender, privChannel);
 	}

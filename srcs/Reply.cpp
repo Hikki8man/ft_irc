@@ -2,7 +2,6 @@
 
 // ========== RPL_WELCOME (001) ==========
 void Server::send_rpl_welcome(const Client& client) {
-
 	if (client.getPollfd().revents & POLLOUT) {
 		std::string msg;
 		msg = getPrefix() + " 001 " + client.getNickname() + " :Que des bandits ici ! Fais attention à toi " + client.getNickname() + CRLF;
@@ -12,86 +11,94 @@ void Server::send_rpl_welcome(const Client& client) {
 	}
 }
 
-// // ========== JOIN ==========
-// void  Server::send_join(SOCKET _sender, SOCKET _joiner, const Channel& chan) {
-// 	Client& sender = getClientBySocket(_sender);
-// 	Client& joiner = getClientBySocket(_joiner);
-// 	if (sender.getPollfd().revents & POLLOUT) {
-// 			std::string msg = joiner.getPrefix() + " JOIN " + chan.getName() + CRLF;
-// 			int ret = send(_sender, msg.c_str(), msg.size(), 0);
-// 			if (ret == -1)
-// 				std::cerr << "Error while sending JOIN message to client" << std::endl;			
-// 		}
-// }
+// ========== RPL_LISTSTART (321) ==========
+void Server::send_rpl_liststart(const Client& client) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg;
+		msg = getPrefix() + " 321 " + client.getNickname() + " Channel :Users  Name" + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_LISTSTART message to client" << std::endl;
+	}
+}
 
-// // ========== PART ==========
-// void Server::send_part(const Client& client, const Client& leaver, const Channel& chan, const std::string& reason) {
-// 	if (client.getPollfd().revents & POLLOUT) {
-// 		std::string msg = leaver.getPrefix() + " PART " + chan.getName();
-// 		if (!reason.empty())
-// 			msg += " :" + reason;
-// 		msg += CRLF;
-// 		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
-// 		if (ret == -1)
-// 			std::cerr << "Error while sending PART message to client" << std::endl;
-// 	}
-// }
+// ========== RPL_LIST (322) ==========
+void Server::send_rpl_list(const Client& client, const Channel& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg;
+		msg = getPrefix() + " 322 " + client.getNickname() + " " + channel.getName() + " " + intToString(channel.getClientsAndMode().size()) + " :" + channel.getTopic() + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_LIST message to client" << std::endl;
+	}
+}
 
-// // ========== QUIT ==========
-// void Server::send_quit(const Client& client, SOCKET rcv, const std::string& reason) {
-// 	Client& receiver = getClientBySocket(rcv);
-// 	if (receiver.getPollfd().revents & POLLOUT) {
-// 		std::string msg = client.getPrefix() + " QUIT :" + reason + CRLF;
-// 		int ret = send(rcv, msg.c_str(), msg.size(), 0);
-// 		if (ret == -1)
-// 			std::cerr << "Error while sending QUIT message to client" << std::endl;
-// 	}
-// }
+// ========== RPL_LISTEND (323) ==========
+void Server::send_rpl_listend(const Client& client) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg;
+		msg = getPrefix() + " 323 " + client.getNickname() + " :End of /LIST" + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_LISTEND message to client" << std::endl;
+	}
+}
 
-// // ========= PRIVMSG =========
-// void Server::send_privmsg(const Client& sender, const Client& receiver, const std::string& name, const std::string& msg) {
-// 	if (receiver.getPollfd().revents & POLLOUT) {
-// 		std::string msg_to_send = sender.getPrefix() + " PRIVMSG " + name + " :" + msg + CRLF;
-// 		int ret = send(receiver.getSocket(), msg_to_send.c_str(), msg_to_send.size(), 0);
-// 		if (ret == -1)
-// 			std::cerr << "Error while sending PRIVMSG message to client" << std::endl;
-// 	}
-// }
+// ========== RPL_CHANNELMODEIS (324) ==========
 
-// // ========== NOTICE ==========
-// void Server::send_notice(const std::string& prefix, const Client& receiver, const std::string& name, const std::string& msg) {
-// 	if (receiver.getPollfd().revents & POLLOUT) {
-// 		std::string n(name);
-// 		if (name.empty())
-// 			n = "*";
-// 		std::string msg_to_send = prefix + " NOTICE " + name + " :" + msg + CRLF;
-// 		int ret = send(receiver.getSocket(), msg_to_send.c_str(), msg_to_send.size(), 0);
-// 		if (ret == -1)
-// 			std::cerr << "Error while sending NOTICE message to client" << std::endl;
-// 	}
-// }
+void Server::send_rpl_channelmodeis(const Client& client, const Channel& chan) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string modesInfo = "";
+		if (chan.hasMode(LIMIT))
+			modesInfo += " " + std::to_string(chan.getLimit());
+		if (chan.hasMode(KEY))
+			modesInfo += " " + chan.getKey();
+		std::string msg = getPrefix() + " 324 " + client.getNickname() + " " + chan.getName() + " +" + chan.getModes() + modesInfo + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_CHANNELMODEIS message to client" << std::endl;
+	}
+}
 
-// // ========== ERROR ==========
-// void Server::send_error(const Client& client, const std::string& msg) {
-// 	if (client.getPollfd().revents & POLLOUT) {
-// 		std::string msg_to_send = "ERROR :Closing Link: " + client.getIp() + " (" + msg + ")" + CRLF;
-// 		int ret = send(client.getSocket(), msg_to_send.c_str(), msg_to_send.size(), 0);
-// 		if (ret == -1)
-// 			std::cerr << "Error while sending ERROR message to client" << std::endl;
-// 		close(client.getSocket());
-// 	}
-// }
+// ========== RPL_NOTOPIC (331) ==========
+void Server::send_rpl_notopic(const Client& client, const Channel& chan) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 331 " + client.getNickname() + " " + chan.getName() + " :No topic is set" + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_NOTOPIC message to client" << std::endl;
+	}
+}
+
+// ========== RPL_TOPIC (332) ==========
+void Server::send_rpl_topic(const Client& client, const Channel& chan) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 332 " + client.getNickname() + " " + chan.getName() + " :" + chan.getTopic() + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_TOPIC message to client" << std::endl;
+	}
+}
+
+// ========== RPL_TOPICWHOTIME (333) ==========
+void Server::send_rpl_topicwhotime(const Client& client, const Channel& chan) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 333 " + client.getNickname() + " " + chan.getName() + " " + chan.getTopicCreatorAndWhen() + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_TOPICWHOTIME message to client" << std::endl;
+	}
+}
 
 // ========== RPL_NAMREPLY (353) ==========
-void  Server::send_rpl_namreply(const Client& client, const Channel& chann) {
+void  Server::send_rpl_namreply(const Client& client, const Channel& chan) {
 	if (client.getPollfd().revents & POLLOUT) {
-		Channel chan(chann); //TODO: temp find another way
 		std::string prefix = getPrefix() + " 353 " + client.getNickname() + " = " + chan.getName() + " :";
 
 		std::string clients_names;
 
 		// Get all clients names
-		for (std::map<SOCKET, char>::iterator it = chan.getClientsAndMod().begin(); it != chan.getClientsAndMod().end(); it++) {
+		for (std::map<SOCKET, char>::const_iterator it = chan.getClientsAndMode().begin(); it != chan.getClientsAndMode().end(); it++) {
 			if (it->second != '\0')
 				clients_names += it->second;
 			clients_names += getClientBySocket(it->first).getNickname() + " ";

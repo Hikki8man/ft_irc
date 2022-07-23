@@ -53,6 +53,8 @@ SRCS 		+=	Command.cpp \
 				ModeCommand.cpp \
 				QuitCommand.cpp \
 				NamesCommand.cpp \
+				TopicCommand.cpp \
+				ListCommand.cpp \
 				WhoisCommand.cpp \
 				MotdCommand.cpp \
 				TimeCommand.cpp \
