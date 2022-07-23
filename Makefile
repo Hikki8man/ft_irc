@@ -54,6 +54,7 @@ SRCS 		+=	Command.cpp \
 				QuitCommand.cpp \
 				NamesCommand.cpp \
 				TopicCommand.cpp \
+				ListCommand.cpp \
 
 #===============================#
 #            HEADERS            #

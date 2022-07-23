@@ -6,7 +6,7 @@
 #include <ctime>
 #include "Client.hpp"
 
-#define SECRET 's'
+#define SECRET 's' // TODO: handle properly
 #define PROTECTED_TOPIC 't'
 #define NO_EXTERNAL_MESSAGES 'n'
 #define INVITE 'i'
@@ -38,7 +38,7 @@ class Channel {
 		const std::string getName() const;
 		const std::string getKey() const;
 		const int getLimit() const;
-		std::map<SOCKET, char>& getClientsAndMod();
+		const std::map<SOCKET, char>& getClientsAndMode() const;
 		char getClientMode(const SOCKET&) const;
 		const std::string getTopic() const;
 		const std::string getTopicCreatorAndWhen() const;
@@ -46,6 +46,7 @@ class Channel {
 		
 		void clearTopic();
 		void addClient(Client&, const std::string& key = "");
+		void insertClient(std::pair<SOCKET, char>);
 		void removePartClient(const Client&, const std::string& reason = "");
 		void removeQuitClient(const Client&);
 
@@ -58,7 +59,7 @@ class Channel {
 		void setTopicCreatorAndWhen(const Client& client);
 
 		std::string 				_name, _key;
-		std::map<SOCKET, char>	_clientsAndMod;
+		std::map<SOCKET, char>		_clientsAndMode;
 		std::string					_modes;
 		std::string					_topic, _topicCreatorAndWhen;
 		int							_limit;

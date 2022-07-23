@@ -37,13 +37,6 @@ class Server {
 
 		bool nickIsUsed(const std::string&);
 
-		// void send_join(SOCKET sender, SOCKET joiner, const Channel&);
-		// void send_part(const Client&, const Client&, const Channel&, const std::string&);
-		// void send_quit(const Client&, SOCKET receiver, const std::string&);
-		// void send_privmsg(const Client&, const Client&, const std::string&, const std::string&);
-		// void send_notice(const std::string&, const Client&, const std::string&, const std::string&);
-		void send_error(const Client&, const std::string&);
-
 		// Send Reply to client
 		void sendMessage(int toSend, const std::string& message, bool prefix = true) const;
 		void sendMessage(Client &toSend, const std::string& message, bool prefix = true) const;
@@ -55,6 +48,9 @@ class Server {
 		void send_rpl_topic(const Client&, const Channel&);
 		void send_rpl_notopic(const Client&, const Channel&);
 		void send_rpl_topicwhotime(const Client&, const Channel&);
+		void send_rpl_liststart(const Client&);
+		void send_rpl_list(const Client&, const Channel&);
+		void send_rpl_listend(const Client&);
 
 		// Send Error Reply to client
 		void send_err_nosuchnick(const Client&, const std::string&);

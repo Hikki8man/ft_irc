@@ -12,7 +12,7 @@ Channel& Channel::operator=(const Channel& other) {
 	if (this != &other) {
 		_name = other._name;
 		_key = other._key;
-		_clientsAndMod = other._clientsAndMod;
+		_clientsAndMode = other._clientsAndMode;
 		_modes = other._modes;
 		_limit = other._limit;
 	}
@@ -31,13 +31,13 @@ const std::string Channel::getKey() const {
 	return _key;
 }
 
-std::map<SOCKET, char> &Channel::getClientsAndMod() {
-	return _clientsAndMod;
+const std::map<SOCKET, char> &Channel::getClientsAndMode() const {
+	return _clientsAndMode;
 }
 
 char Channel::getClientMode(const SOCKET& sock) const {
-	std::map<SOCKET, char>::const_iterator it = _clientsAndMod.find(sock);
-	if (it == _clientsAndMod.end())
+	std::map<SOCKET, char>::const_iterator it = _clientsAndMode.find(sock);
+	if (it == _clientsAndMode.end())
 		return NONE;
 	return it->second;
 }
@@ -51,7 +51,7 @@ char Channel::getClientMode(const SOCKET& sock) const {
 // }
 
 // const Client &Channel::findClientByName(const std::string& nick) const {
-// 	for (std::map<int, std::pair<Client&, char> >::const_iterator it = _clientsAndMod.begin(); it != _clientsAndMod.end(); it++) {
+// 	for (std::map<int, std::pair<Client&, char> >::const_iterator it = _clientsAndMode.begin(); it != _clientsAndMode.end(); it++) {
 // 		if (it->second.client.getNickname() == nick)
 // 			return it->second.client;
 // 	}
@@ -98,7 +98,7 @@ void Channel::setTopic(const Client& client, const std::string& topic) {
 	else
 		_topic = topic;
 		setTopicCreatorAndWhen(client);
-	for (std::map<SOCKET, char>::iterator it = _clientsAndMod.begin(); it != _clientsAndMod.end(); it++) {
+	for (std::map<SOCKET, char>::iterator it = _clientsAndMode.begin(); it != _clientsAndMode.end(); it++) {
 		std::string msg = "TOPIC " + _name + " :" + _topic;
 		client.sendMessage(it->first, msg);
 	}
@@ -112,20 +112,20 @@ void Channel::clearTopic() {
 
 void Channel::addClient(Client& client, const std::string& key) {
 	// Check if the client is already in the channel
-	if (_clientsAndMod.find(client.getSocket()) != _clientsAndMod.end())
+	if (_clientsAndMode.find(client.getSocket()) != _clientsAndMode.end())
 		return;
 	else if (_key != key) {
 		Irc::getInstance().getServer()->send_err_badchannelkey(client, _name);
 		return;
-	} else if (hasMode(LIMIT) && _clientsAndMod.size() >= _limit) {
+	} else if (hasMode(LIMIT) && _clientsAndMode.size() >= _limit) {
 		Irc::getInstance().getServer()->send_err_channelisfull(client, _name);
 		return;
 	}
-	if (_clientsAndMod.empty())
-		_clientsAndMod.insert(std::make_pair(client.getSocket(), '@'));
+	if (_clientsAndMode.empty())
+		_clientsAndMode.insert(std::make_pair(client.getSocket(), '@'));
 	else
-		_clientsAndMod.insert(std::make_pair(client.getSocket(), '\0'));
-	for (std::map<SOCKET, char>::iterator it = _clientsAndMod.begin(); it != _clientsAndMod.end(); ++it)
+		_clientsAndMode.insert(std::make_pair(client.getSocket(), '\0'));
+	for (std::map<SOCKET, char>::iterator it = _clientsAndMode.begin(); it != _clientsAndMode.end(); ++it)
 		client.sendMessage(it->first, std::string ("JOIN ") + _name);
 	Irc::getInstance().getServer()->send_rpl_namreply(client, *this);
 	Irc::getInstance().getServer()->send_rpl_endofnames(client, *this);
@@ -135,14 +135,18 @@ void Channel::removePartClient(const Client& client, const std::string& reason) 
 	std::string msg = "PART " + _name; + " :" + reason;
 	if (reason.empty())
 		msg += " :" + reason;
-	for (std::map<SOCKET, char>::iterator it = _clientsAndMod.begin(); it != _clientsAndMod.end(); ++it) {
+	for (std::map<SOCKET, char>::iterator it = _clientsAndMode.begin(); it != _clientsAndMode.end(); ++it) {
 		client.sendMessage(it->first, msg);
 	}
-	_clientsAndMod.erase(client.getSocket());
+	_clientsAndMode.erase(client.getSocket());
+}
+
+void Channel::insertClient(std::pair<SOCKET, char> client) {
+	_clientsAndMode.insert(client);
 }
 
 void Channel::removeQuitClient(const Client& client) {
-	_clientsAndMod.erase(client.getSocket());
+	_clientsAndMode.erase(client.getSocket());
 }
 
 void Channel::addMode(char mode) {

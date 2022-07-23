@@ -12,6 +12,7 @@
 #include "commands/impl/QuitCommand.hpp"
 #include "commands/impl/NamesCommand.hpp"
 #include "commands/impl/TopicCommand.hpp"
+#include "commands/impl/ListCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -27,6 +28,7 @@ CommandManager::CommandManager()
 	addCommand("QUIT", new QuitCommand());
 	addCommand("NAMES", new NamesCommand());
 	addCommand("TOPIC", new TopicCommand());
+	addCommand("LIST", new ListCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)
