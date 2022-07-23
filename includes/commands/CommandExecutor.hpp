@@ -6,6 +6,7 @@
 #include "Command.hpp"
 
 class Command;
+class Server;
 
 class CommandExecutor
 {
@@ -13,7 +14,6 @@ class CommandExecutor
 		bool	_registered_only;
 	public:
 		virtual void execute(const Command& cmd, Client& sender) = 0;
-
 		virtual ~CommandExecutor() {}
 
 		CommandExecutor() : _registered_only(true) {};

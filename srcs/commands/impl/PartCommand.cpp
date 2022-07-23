@@ -20,14 +20,14 @@ void PartCommand::execute(const Command& cmd, Client& sender)
 			Irc::getInstance().getServer()->send_err_nosuchchannel(sender, *it);
 			continue;
 		}
-		else if (channel->second.getClients().find(sender.getSocket()) == channel->second.getClients().end()) {
+		else if (!sender.isInChannel(channel->second)) {
 			Irc::getInstance().getServer()->send_err_notonchannel(sender, *it);
 			continue;
 		}
 		else {
-			channel->second.removeClient(sender, reason);
+			channel->second.removePartClient(sender, reason);
 			sender.removeChannel(channel->second);
-			if (channel->second.getClients().empty())
+			if (channel->second.getClientsAndMod().empty())
 				Irc::getInstance().getServer()->getChannels().erase(channel);
 		}
 	}

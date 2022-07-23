@@ -1,8 +1,8 @@
 #include "../../includes/commands/Command.hpp"
 
-Command::Command(Client& sender) : _sender(sender) {}
+Command::Command() : _executor(NULL) {}
 
-Command::Command(const std::string& name, const std::vector<std::string>& args, Client& sender) : _name(name), _args(args), _sender(sender) {}
+Command::Command(const std::string& name, const std::vector<std::string>& args) : _name(name), _args(args) {}
 
 const std::vector<std::string>& Command::getArgs() const {
 	return _args;
@@ -12,8 +12,8 @@ const std::string& Command::getName() const {
 	return _name;
 }
 
-const Client& Command::getSender() const {
-	return _sender;
+CommandExecutor *Command::getExecutor() const {
+	return _executor;
 }
 
 CommandExecutor *Command::parse(std::string& buffer) {
@@ -66,5 +66,6 @@ CommandExecutor *Command::parse(std::string& buffer) {
 		}
 	}
 	_args = args;
+	_executor = executor;
 	return executor;
 }

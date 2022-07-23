@@ -13,15 +13,15 @@ class Command {
 	private:
 		std::string					_name;
 		std::vector<std::string>	_args;
-		Client&						_sender;
+		CommandExecutor *_executor;
 
 	public:
-		Command(Client& sender);
-		Command(const std::string& name, const std::vector<std::string>& args, Client& sender);
+		Command();
+		Command(const std::string& name, const std::vector<std::string>& args);
 
 		const std::string& getName() const;
 		const std::vector<std::string>& getArgs() const;
-		const Client& getSender() const;
+		CommandExecutor *getExecutor() const;
 
 		CommandExecutor *parse(std::string& buffer);
 };

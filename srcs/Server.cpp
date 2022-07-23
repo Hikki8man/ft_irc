@@ -49,12 +49,23 @@ Client &Server::findClientByName(const std::string& nick) {
 	return _clients.begin()->second;
 }
 
+Client &Server::getClientBySocket(SOCKET socket) {
+	std::map<int, Client>::iterator client = _clients.find(socket);
+	if (client == _clients.end())
+		return _clients.begin()->second;
+	return client->second;
+}
+
 const std::string Server::getIp() const {
 	return _srv_ip;
 }
 
 const std::string Server::getPassword() const {
 	return _password;
+}
+
+const SOCKET Server::getSocket() const {
+	return _srv_fd;
 }
 
 // Setter ===========================================================================
@@ -69,17 +80,42 @@ void Server::setPassword(const std::string& password) {
 
 // Methods ==========================================================================
 
+void Server::sendMessage(int toSend, const std::string& args, bool prefix) const {
+	Client& toSendTo = Irc::getInstance().getServer()->getClientBySocket(toSend);
+	if (toSendTo.getPollfd().revents & POLLOUT) {
+		std::string msg;
+		if (prefix == true)
+			msg = getPrefix() + " ";
+		msg += args + CRLF;
+		int ret = send(toSendTo.getSocket(), msg.c_str(), msg.length(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending message to " << toSendTo.getNickname() << std::endl;
+	}
+}
+
+void Server::sendMessage(Client &toSendTo, const std::string& args, bool prefix) const {
+	if (toSendTo.getPollfd().revents & POLLOUT) {
+		std::string msg;
+		if (prefix == true)
+			msg = getPrefix() + " ";
+		msg += args + CRLF;
+		int ret = send(toSendTo.getSocket(), msg.c_str(), msg.length(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending message to " << toSendTo.getNickname() << std::endl;
+	}
+}
+
 void Server::do_cmd(Client& sender) {
 
 	std::cout << "msg received: " << sender.getBuffer() << std::endl;
 	while (sender.getBuffer().find("\r\n") != std::string::npos) {
 
-		Command cmd(sender);
+		Command cmd;
 		CommandExecutor *executor = cmd.parse(sender.getBuffer());
 
 		if (executor) {
-			if (cmd.getName() != "PASS" && !sender.isLogged() && getPassword().length() > 0) {
-				send_notice(getPrefix(), sender,"PASS", "You need to identify with PASS command first.");
+			if (cmd.getName() != "PASS" && cmd.getName() != "QUIT" && !sender.isLogged() && getPassword().length() > 0) {
+				sendMessage(sender, "NOTICE PASS :You need to identify with PASS command first.");
 			}
 			else if (executor->isRegisteredOnly() && !sender.isRegistered())
 				Irc::getInstance().getServer()->send_err_notregistered(sender);
@@ -169,12 +205,14 @@ int Server::newConnection() {
 	newSocket.events = POLLIN | POLLOUT;
 	_sockets.push_back(newSocket);
 
-	std::cout << inet_ntoa(client_addr.sin_addr) << " connected" << std::endl;
 	
 
-	// Add new client to clients list, hummmm
+	// Add new client to clients list
 	Client newClient(new_socket, client_addr);
+	newClient.setIp(inet_ntoa(client_addr.sin_addr));
 	_clients[new_socket] = newClient;
+
+	std::cout << newClient.getIp() << " connected" << std::endl;
 
 	return 0;
 }
@@ -183,20 +221,27 @@ int Server::recvMsgFrom(SocketIt socket) {
 	char buffer[BUFFER_MAX] = {0};
 	Client& sender = _clients[socket->fd];
 	int n;
-	if ((n = recv(socket->fd, buffer, BUFFER_MAX, 0)) < 0) {
-		// _clients.erase(socket->fd);
-		// _sockets.erase(socket); ??
+	if ((n = recv(socket->fd, buffer, BUFFER_MAX - 2, 0)) < 0) {
+		_clients.erase(socket->fd);
+		_sockets.erase(socket);
 		perror("recv");
-		return 1;
+		return 0;
 	}
 	if (n == 0) {
 		// need to remove client from clients list of channels
-		std::cout << sender.getNickname() << " disconnected" << std::endl;
-		_clients.erase(socket->fd);
+		std::cout << sender.getIp() << " disconnected" << std::endl;
+		Command cmd;
+		sender.getBuffer().clear();
+		sender.setBuffer("QUIT :Remote host closed the connection\r\n");
+		CommandExecutor *executor = cmd.parse(sender.getBuffer());
+		executor->execute(cmd, sender);
 		_sockets.erase(socket);
 		return 0;
 	}
-	sender.setBuffer(buffer);
+	std::string buf(buffer);
+	if (buf.size() == BUFFER_MAX - 2)
+		buf += CRLF;
+	sender.setBuffer(buf);
 	do_cmd(sender);
 	return 1;
 }
@@ -215,6 +260,10 @@ int Server::run(int port) {
 		}
 		else if (pollRet > 0) {
 			for (SocketIt it = _sockets.begin(); it != _sockets.end(); ++it) {
+				if (it->fd != _srv_fd && _clients.find(it->fd) == _clients.end()) {
+					_sockets.erase(it);
+					break;
+				}
 				if (it->revents & POLLIN) {
 					if (it->fd == _srv_fd) {
 						newConnection();

@@ -18,6 +18,9 @@ Client& Client::operator=(const Client& other) {
 		_addr = other._addr;
 		_bufferStocked = other._bufferStocked;
 		_registered = other._registered;
+		_channels = other._channels;
+		_prefix = other._prefix;
+		_ip = other._ip;
 	}
 	return *this;
 }
@@ -62,8 +65,12 @@ const std::string Client::getPrefix() const {
 	return _prefix;
 }
 
-const std::map<std::string, const Channel&>& Client::getChannels() const {
+std::map<std::string, const Channel&>& Client::getChannels() {
 	return _channels;
+}
+
+const std::string Client::getIp() const {
+	return _ip;
 }
 
 // SETTERS
@@ -88,7 +95,11 @@ void Client::setRegistered(bool registered) {
 }
 
 void Client::setPrefix() {
-	_prefix = ":" + _nick + "!" + _user + "@" + inet_ntoa(_addr.sin_addr);
+	_prefix = ":" + _nick + "!" + _user + "@" + getIp();
+}
+
+void Client::setIp(const std::string& ip) {
+	_ip = ip;
 }
 
 // Methods
@@ -105,10 +116,40 @@ const bool Client::isLogged() const {
 	return _logged || Irc::getInstance().getServer()->getPassword().length() == 0;
 }
 
-void Client::addChannel(const Channel& channel) {
-	_channels.insert(std::make_pair(channel.getName(), channel));
+bool Client::isInChannel(const Channel& channel) const {
+	return _channels.find(channel.getName()) != _channels.end();
 }
 
-void Client::removeChannel(const Channel& channel) {
+void Client::addChannel(const Channel& channel) {
+	_channels.insert(std::make_pair(channel.getName(), channel));
+	// _channels[channel.getName()] = channel;
+}
+
+void Client::removeChannel(Channel& channel) {
 	_channels.erase(channel.getName());
+}
+
+void Client::sendMessage(int toSend, const std::string& args, bool prefix) const {
+	Client& toSendTo = Irc::getInstance().getServer()->getClientBySocket(toSend);
+	if (toSendTo.getPollfd().revents & POLLOUT) {
+		std::string msg;
+		if (prefix == true)
+			msg = getPrefix() + " ";
+		msg += args + CRLF;
+		int ret = send(toSendTo.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending " << msg.substr(0, msg.find_first_of(" ")) << " message to " << toSendTo.getIp() << std::endl;
+	}
+}
+
+void Client::sendMessage(Client &toSendTo, const std::string& args, bool prefix) const {
+	if (toSendTo.getPollfd().revents & POLLOUT) {
+		std::string msg;
+		if (prefix == true)
+			msg = getPrefix() + " ";
+		msg += args + CRLF;
+		int ret = send(toSendTo.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending " << msg.substr(0, msg.find_first_of(" ")) << " message to " << toSendTo.getIp() << std::endl;
+	}
 }
