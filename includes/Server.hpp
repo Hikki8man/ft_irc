@@ -48,7 +48,7 @@ class Server {
 		void sendMessage(Client &toSend, const std::string& message, bool prefix = true) const;
 
 		void send_rpl_welcome(const Client&);
-		void send_rpl_namreply(const Client&, Channel&);
+		void send_rpl_namreply(const Client&, const Channel&);
 		void send_rpl_endofnames(const Client&, const Channel&);
 		void send_error(const Client&, const std::string&);
 		void send_rpl_channelmodeis(const Client&, const Channel&);

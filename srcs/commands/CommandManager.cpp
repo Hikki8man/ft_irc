@@ -10,6 +10,7 @@
 #include "commands/impl/NoticeCommand.hpp"
 #include "commands/impl/ModeCommand.hpp"
 #include "commands/impl/QuitCommand.hpp"
+#include "commands/impl/NamesCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -23,6 +24,7 @@ CommandManager::CommandManager()
 	addCommand("NOTICE", new NoticeCommand());
 	addCommand("MODE", new ModeCommand());
 	addCommand("QUIT", new QuitCommand());
+	addCommand("NAMES", new NamesCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)

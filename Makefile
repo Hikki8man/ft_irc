@@ -52,6 +52,7 @@ SRCS 		+=	Command.cpp \
 				NoticeCommand.cpp \
 				ModeCommand.cpp \
 				QuitCommand.cpp \
+				NamesCommand.cpp \
 
 #===============================#
 #            HEADERS            #
