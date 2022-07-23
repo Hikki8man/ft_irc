@@ -82,6 +82,9 @@ void Channel::addClient(Client& client, const std::string& key) {
 	} else if (hasMode(LIMIT) && _clientsAndMod.size() >= _limit) {
 		Irc::getInstance().getServer()->send_err_channelisfull(client, _name);
 		return;
+	} else if (hasMode(INVITE_ONLY) && !isInvited(client)) {
+		Irc::getInstance().getServer()->send_err_inviteonlychan(client, _name);
+		return;
 	}
 	if (_clientsAndMod.empty())
 		_clientsAndMod.insert(std::make_pair(client.getSocket(), '@'));
@@ -100,10 +103,12 @@ void Channel::removePartClient(const Client& client, const std::string& reason) 
 	for (std::map<SOCKET, char>::iterator it = _clientsAndMod.begin(); it != _clientsAndMod.end(); ++it) {
 		client.sendMessage(it->first, msg);
 	}
+	removeInvite(client);
 	_clientsAndMod.erase(client.getSocket());
 }
 
 void Channel::removeQuitClient(const Client& client) {
+	removeInvite(client);
 	_clientsAndMod.erase(client.getSocket());
 }
 

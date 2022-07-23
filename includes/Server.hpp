@@ -80,6 +80,7 @@ class Server {
 		void send_err_chanoprivsneeded(const Client&, const std::string&);
 		void send_err_unknownmode(const Client&, const char);
 		void send_err_channelisfull(const Client&, const std::string&);
+		void send_err_inviteonlychan(const Client&, const std::string&);
 
 		std::map<std::string, Channel>& getChannels();
 		std::map<SOCKET, Client>& getClients();
