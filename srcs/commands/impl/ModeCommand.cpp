@@ -81,7 +81,7 @@ void ModeCommand::execute(const Command& cmd, Client& sender) {
             message += " " + args[2];
         message += CRLF;
         if (modes.length() > 1) // don't send the message if no mode was added or removed
-            send(sender.getSocket(), message.c_str(), message.size(), 0);
+			sender.sendMessage(sender, message, false);
         return;
     }
 }

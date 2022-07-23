@@ -146,3 +146,37 @@ void Server::send_rpl_channelmodeis(const Client& client, const Channel& chan) {
 			std::cerr << "Error while sending RPL_CHANNELMODEIS message to client" << std::endl;
 	}
 }
+
+// ========== RPL_ENDOFWHOIS (318) ==========
+
+void Server::send_rpl_endofwhois(const Client& client, const std::string& name) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 318 " + client.getNickname() + " " + name + " :End of /WHOIS list." + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_ENDOFWHOIS message to client" << std::endl;
+	}
+}
+
+// ========== RPL_WHOISUSER (311) ==========
+
+void Server::send_rpl_whoisuser(const Client& client, const Client& user) {
+	if (client.getPollfd().revents & POLLOUT) {
+		// TODO add real hostname
+		std::string msg = getPrefix() + " 311 " + client.getNickname() + " " + user.getNickname() + " " + user.getUsername() + " localhost * :" + user.getRealName() + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_WHOISUSER message to client" << std::endl;
+	}
+}
+
+// ========== RPL_WHOISHOST (378) ==========
+
+void Server::send_rpl_whoishost(const Client& client, const Client& user) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 378 " + client.getNickname() + " " + user.getNickname() + " :is connecting from *@localhost 127.0.0.1" + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_WHOISHOST message to client" << std::endl;
+	}
+}

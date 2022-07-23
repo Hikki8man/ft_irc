@@ -52,6 +52,9 @@ class Server {
 		void send_rpl_endofnames(const Client&, const Channel&);
 		void send_error(const Client&, const std::string&);
 		void send_rpl_channelmodeis(const Client&, const Channel&);
+		void send_rpl_endofwhois(const Client&, const std::string&);
+		void send_rpl_whoisuser(const Client&, const Client&);
+		void send_rpl_whoishost(const Client&, const Client&);
 
 		// Send Error Reply to client
 		void send_err_nosuchnick(const Client&, const std::string&);
