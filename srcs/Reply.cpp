@@ -82,6 +82,52 @@ void Server::send_rpl_welcome(const Client& client) {
 // 	}
 // }
 
+// ========== RPL_CHANNELMODEIS (324) ==========
+
+void Server::send_rpl_channelmodeis(const Client& client, const Channel& chan) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string modesInfo = "";
+		if (chan.hasMode(LIMIT))
+			modesInfo += " " + std::to_string(chan.getLimit());
+		if (chan.hasMode(KEY))
+			modesInfo += " " + chan.getKey();
+		std::string msg = getPrefix() + " 324 " + client.getNickname() + " " + chan.getName() + " +" + chan.getModes() + modesInfo + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_CHANNELMODEIS message to client" << std::endl;
+	}
+}
+
+// ========== RPL_NOTOPIC (331) ==========
+void Server::send_rpl_notopic(const Client& client, const Channel& chan) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 331 " + client.getNickname() + " " + chan.getName() + " :No topic is set" + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_NOTOPIC message to client" << std::endl;
+	}
+}
+
+// ========== RPL_TOPIC (332) ==========
+void Server::send_rpl_topic(const Client& client, const Channel& chan) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 332 " + client.getNickname() + " " + chan.getName() + " :" + chan.getTopic() + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_TOPIC message to client" << std::endl;
+	}
+}
+
+// ========== RPL_TOPICWHOTIME (333) ==========
+void Server::send_rpl_topicwhotime(const Client& client, const Channel& chan) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 333 " + client.getNickname() + " " + chan.getName() + " " + chan.getTopicCreatorAndWhen() + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_TOPICWHOTIME message to client" << std::endl;
+	}
+}
+
 // ========== RPL_NAMREPLY (353) ==========
 void  Server::send_rpl_namreply(const Client& client, const Channel& chann) {
 	if (client.getPollfd().revents & POLLOUT) {
@@ -128,21 +174,5 @@ void Server::send_rpl_endofnames(const Client& client, const Channel& chan) {
 		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
 		if (ret == -1)
 			std::cerr << "Error while sending RPL_ENDOFNAMES message to client" << std::endl;
-	}
-}
-
-// ========== RPL_CHANNELMODEIS (324) ==========
-
-void Server::send_rpl_channelmodeis(const Client& client, const Channel& chan) {
-	if (client.getPollfd().revents & POLLOUT) {
-		std::string modesInfo = "";
-		if (chan.hasMode(LIMIT))
-			modesInfo += " " + std::to_string(chan.getLimit());
-		if (chan.hasMode(KEY))
-			modesInfo += " " + chan.getKey();
-		std::string msg = getPrefix() + " 324 " + client.getNickname() + " " + chan.getName() + " +" + chan.getModes() + modesInfo + CRLF;
-		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
-		if (ret == -1)
-			std::cerr << "Error while sending RPL_CHANNELMODEIS message to client" << std::endl;
 	}
 }

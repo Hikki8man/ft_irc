@@ -35,6 +35,13 @@ std::map<SOCKET, char> &Channel::getClientsAndMod() {
 	return _clientsAndMod;
 }
 
+char Channel::getClientMode(const SOCKET& sock) const {
+	std::map<SOCKET, char>::const_iterator it = _clientsAndMod.find(sock);
+	if (it == _clientsAndMod.end())
+		return NONE;
+	return it->second;
+}
+
 // const Channel::ClientAndMod &Channel::getClientAndMod(const std::string& nick) const {
 // 	for (std::map<int, Channel::ClientAndMod>::const_iterator it = _clients.begin(); it != _clients.end(); it++) {
 // 		if (it->second.client.getNickname() == nick)
@@ -59,6 +66,15 @@ const int Channel::getLimit() const {
 	return _limit;
 }
 
+const std::string Channel::getTopic() const {
+	return _topic;
+}
+
+const std::string Channel::getTopicCreatorAndWhen() const {
+	return _topicCreatorAndWhen;
+}
+
+
 // setters
 void Channel::setName(const std::string& name) {
 	_name = name;
@@ -70,6 +86,28 @@ void Channel::setKey(const std::string& key) {
 
 void Channel::setLimit(const int limit) {
 	_limit = limit;
+}
+
+void Channel::setTopicCreatorAndWhen(const Client& client) {
+	_topicCreatorAndWhen = client.getPrefix() + " " + intToString(time(NULL));
+}
+
+void Channel::setTopic(const Client& client, const std::string& topic) {
+	if (topic.empty())
+		_topic.clear();
+	else
+		_topic = topic;
+		setTopicCreatorAndWhen(client);
+	for (std::map<SOCKET, char>::iterator it = _clientsAndMod.begin(); it != _clientsAndMod.end(); it++) {
+		std::string msg = "TOPIC " + _name + " :" + _topic;
+		client.sendMessage(it->first, msg);
+	}
+}
+
+// Methods
+
+void Channel::clearTopic() {
+	_topic.clear();
 }
 
 void Channel::addClient(Client& client, const std::string& key) {

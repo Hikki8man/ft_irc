@@ -42,6 +42,7 @@ class Server {
 		// void send_quit(const Client&, SOCKET receiver, const std::string&);
 		// void send_privmsg(const Client&, const Client&, const std::string&, const std::string&);
 		// void send_notice(const std::string&, const Client&, const std::string&, const std::string&);
+		void send_error(const Client&, const std::string&);
 
 		// Send Reply to client
 		void sendMessage(int toSend, const std::string& message, bool prefix = true) const;
@@ -50,8 +51,10 @@ class Server {
 		void send_rpl_welcome(const Client&);
 		void send_rpl_namreply(const Client&, const Channel&);
 		void send_rpl_endofnames(const Client&, const Channel&);
-		void send_error(const Client&, const std::string&);
 		void send_rpl_channelmodeis(const Client&, const Channel&);
+		void send_rpl_topic(const Client&, const Channel&);
+		void send_rpl_notopic(const Client&, const Channel&);
+		void send_rpl_topicwhotime(const Client&, const Channel&);
 
 		// Send Error Reply to client
 		void send_err_nosuchnick(const Client&, const std::string&);

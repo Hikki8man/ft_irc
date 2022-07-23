@@ -11,6 +11,7 @@
 #include "commands/impl/ModeCommand.hpp"
 #include "commands/impl/QuitCommand.hpp"
 #include "commands/impl/NamesCommand.hpp"
+#include "commands/impl/TopicCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -25,6 +26,7 @@ CommandManager::CommandManager()
 	addCommand("MODE", new ModeCommand());
 	addCommand("QUIT", new QuitCommand());
 	addCommand("NAMES", new NamesCommand());
+	addCommand("TOPIC", new TopicCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)
