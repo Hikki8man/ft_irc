@@ -85,7 +85,7 @@ void Server::send_rpl_welcome(const Client& client) {
 // ========== RPL_NAMREPLY (353) ==========
 void  Server::send_rpl_namreply(const Client& client, const Channel& chann) {
 	if (client.getPollfd().revents & POLLOUT) {
-		Channel chan(chann); //TODO: temp, find another way
+		Channel chan(chann); //TODO: temp find another way
 		std::string prefix = getPrefix() + " 353 " + client.getNickname() + " = " + chan.getName() + " :";
 
 		std::string clients_names;

@@ -221,7 +221,7 @@ int Server::recvMsgFrom(SocketIt socket) {
 	char buffer[BUFFER_MAX] = {0};
 	Client& sender = _clients[socket->fd];
 	int n;
-	if ((n = recv(socket->fd, buffer, BUFFER_MAX, 0)) < 0) {
+	if ((n = recv(socket->fd, buffer, BUFFER_MAX - 2, 0)) < 0) {
 		_clients.erase(socket->fd);
 		_sockets.erase(socket);
 		perror("recv");
@@ -238,7 +238,10 @@ int Server::recvMsgFrom(SocketIt socket) {
 		_sockets.erase(socket);
 		return 0;
 	}
-	sender.setBuffer(buffer);
+	std::string buf(buffer);
+	if (buf.size() == BUFFER_MAX - 2)
+		buf += CRLF;
+	sender.setBuffer(buf);
 	do_cmd(sender);
 	return 1;
 }
