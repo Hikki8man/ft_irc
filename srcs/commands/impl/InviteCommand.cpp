@@ -40,6 +40,5 @@ void InviteCommand::execute(const Command& cmd, Client& sender) {
     }
 
 	targetChannel->addInvite(targetClient);
-	// TODO hostname
-	targetClient.sendMessage(targetClient, sender.getNickname() + "!~" + sender.getUsername() + "@localhost INVITE " + targetNick + " :" + targetChannelName, false);
+	targetClient.sendMessage(targetClient,  "INVITE " + targetNick + " :" + targetChannelName);
 }
