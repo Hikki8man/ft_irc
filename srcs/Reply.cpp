@@ -137,3 +137,107 @@ void Server::send_rpl_endofnames(const Client& client, const Channel& chan) {
 			std::cerr << "Error while sending RPL_ENDOFNAMES message to client" << std::endl;
 	}
 }
+
+// ========== RPL_CHANNELMODEIS (324) ==========
+
+void Server::send_rpl_channelmodeis(const Client& client, const Channel& chan) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string modesInfo = "";
+		if (chan.hasMode(LIMIT))
+			modesInfo += " " + std::to_string(chan.getLimit());
+		if (chan.hasMode(KEY))
+			modesInfo += " " + chan.getKey();
+		std::string msg = getPrefix() + " 324 " + client.getNickname() + " " + chan.getName() + " +" + chan.getModes() + modesInfo + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_CHANNELMODEIS message to client" << std::endl;
+	}
+}
+
+// ========== RPL_ENDOFWHOIS (318) ==========
+
+void Server::send_rpl_endofwhois(const Client& client, const std::string& name) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 318 " + client.getNickname() + " " + name + " :End of /WHOIS list." + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_ENDOFWHOIS message to client" << std::endl;
+	}
+}
+
+// ========== RPL_WHOISUSER (311) ==========
+
+void Server::send_rpl_whoisuser(const Client& client, const Client& user) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 311 " + client.getNickname() + " " + user.getNickname() + " " + user.getUsername() + " " + getIp() + " * :" + user.getRealName() + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_WHOISUSER message to client" << std::endl;
+	}
+}
+
+// ========== RPL_WHOISHOST (378) ==========
+
+void Server::send_rpl_whoishost(const Client& client, const Client& user) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 378 " + client.getNickname() + " " + user.getNickname() + " :is connecting from *@localhost 127.0.0.1" + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_WHOISHOST message to client" << std::endl;
+	}
+}
+
+// ========== RPL_MOTDSTART (375) ==========
+
+void Server::send_rpl_motdstart(const Client& client) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 375 " + client.getNickname() + " :- ft_irc Message of the day - " + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_MOTDSTART message to client" << std::endl;
+	}
+}
+
+// ========== RPL_MOTD (372) ==========
+
+void Server::send_rpl_motd(const Client& client, const std::string& motd) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 372 " + client.getNickname() + " :" + motd + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_MOTD message to client" << std::endl;
+	}
+}
+
+// ========== RPL_ENDOFMOTD (376) ==========
+
+void Server::send_rpl_endofmotd(const Client& client) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 376 " + client.getNickname() + " :End of /MOTD command." + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_ENDOFMOTD message to client" << std::endl;
+	}
+}
+
+// ========== RPL_TIME (391) ==========
+
+void Server::send_rpl_time(const Client& client, const std::string& time) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 391 " + client.getNickname() + " :" + time + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_TIME message to client" << std::endl;
+	}
+}
+
+// ========== RPL_INVITING (341) ==========
+
+void Server::send_rpl_inviting(const Client& client, const std::string& name, const std::string& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 341 " + client.getNickname() + " " + name + " " + channel + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_INVITING message to client" << std::endl;
+	}
+}

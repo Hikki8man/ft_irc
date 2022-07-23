@@ -9,7 +9,7 @@
 #define SECRET 's' // TODO: handle properly
 #define PROTECTED_TOPIC 't'
 #define NO_EXTERNAL_MESSAGES 'n'
-#define INVITE 'i'
+#define INVITE_ONLY 'i'
 #define KEY 'k'
 #define LIMIT 'l'
 #define MODERATED 'm'
@@ -50,6 +50,10 @@ class Channel {
 		void removePartClient(const Client&, const std::string& reason = "");
 		void removeQuitClient(const Client&);
 
+		void addInvite(const Client&);
+		void removeInvite(const Client&);
+		const bool isInvited(const Client&) const;
+
 		void addMode(char mode);
 		void removeMode(char mode);
 		const bool hasMode(char mode) const;
@@ -60,6 +64,7 @@ class Channel {
 
 		std::string 				_name, _key;
 		std::map<SOCKET, char>		_clientsAndMode;
+		std::vector<SOCKET>			_invites;
 		std::string					_modes;
 		std::string					_topic, _topicCreatorAndWhen;
 		int							_limit;

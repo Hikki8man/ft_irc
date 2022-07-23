@@ -75,13 +75,12 @@ void ModeCommand::execute(const Command& cmd, Client& sender) {
         if (modes.at(0) != '+' && modes.at(0) != '-')
             modes = modes.replace(0, 1, "+");
 
-        //TODO afficher host
-        std::string message = ":" + sender.getNickname() + "!~" + sender.getUsername() + "@localhost MODE " + target + " " + modes;
+        std::string message = "MODE " + target + " " + modes;
         if (args.size() > 2)
             message += " " + args[2];
         message += CRLF;
         if (modes.length() > 1) // don't send the message if no mode was added or removed
-            send(sender.getSocket(), message.c_str(), message.size(), 0);
+			sender.sendMessage(sender, message);
         return;
     }
 }

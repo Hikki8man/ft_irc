@@ -55,6 +55,11 @@ SRCS 		+=	Command.cpp \
 				NamesCommand.cpp \
 				TopicCommand.cpp \
 				ListCommand.cpp \
+				WhoisCommand.cpp \
+				MotdCommand.cpp \
+				TimeCommand.cpp \
+				InviteCommand.cpp \
+				KickCommand.cpp \
 
 #===============================#
 #            HEADERS            #
@@ -70,12 +75,19 @@ HEADERS		=	Irc.hpp \
 				CommandExecutor.hpp \
 				JoinCommand.hpp \
 				ModeCommand.hpp \
+				NamesCommand.hpp \
 				NickCommand.hpp \
+				NoticeCommand.hpp \
 				PartCommand.hpp \
 				PassCommand.hpp \
 				PingCommand.hpp \
 				PrivmsgCommand.hpp \
 				UserCommand.hpp \
+				WhoisCommand.hpp \
+				MotdCommand.hpp \
+				TimeCommand.hpp \
+				InviteCommand.hpp \
+				KickCommand.hpp \
 
 #===============================#
 #            OBJECTS            #

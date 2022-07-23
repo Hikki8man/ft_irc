@@ -13,6 +13,11 @@
 #include "commands/impl/NamesCommand.hpp"
 #include "commands/impl/TopicCommand.hpp"
 #include "commands/impl/ListCommand.hpp"
+#include "commands/impl/WhoisCommand.hpp"
+#include "commands/impl/MotdCommand.hpp"
+#include "commands/impl/TimeCommand.hpp"
+#include "commands/impl/InviteCommand.hpp"
+#include "commands/impl/KickCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -29,6 +34,11 @@ CommandManager::CommandManager()
 	addCommand("NAMES", new NamesCommand());
 	addCommand("TOPIC", new TopicCommand());
 	addCommand("LIST", new ListCommand());
+	addCommand("WHOIS", new WhoisCommand());
+	addCommand("MOTD", new MotdCommand());
+	addCommand("TIME", new TimeCommand());
+	addCommand("INVITE", new InviteCommand());
+	addCommand("KICK", new KickCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)
