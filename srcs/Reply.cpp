@@ -162,8 +162,7 @@ void Server::send_rpl_endofwhois(const Client& client, const std::string& name) 
 
 void Server::send_rpl_whoisuser(const Client& client, const Client& user) {
 	if (client.getPollfd().revents & POLLOUT) {
-		// TODO add real hostname
-		std::string msg = getPrefix() + " 311 " + client.getNickname() + " " + user.getNickname() + " " + user.getUsername() + " localhost * :" + user.getRealName() + CRLF;
+		std::string msg = getPrefix() + " 311 " + client.getNickname() + " " + user.getNickname() + " " + user.getUsername() + " " + getIp() + " * :" + user.getRealName() + CRLF;
 		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
 		if (ret == -1)
 			std::cerr << "Error while sending RPL_WHOISUSER message to client" << std::endl;
@@ -222,5 +221,16 @@ void Server::send_rpl_time(const Client& client, const std::string& time) {
 		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
 		if (ret == -1)
 			std::cerr << "Error while sending RPL_TIME message to client" << std::endl;
+	}
+}
+
+// ========== RPL_INVITING (341) ==========
+
+void Server::send_rpl_inviting(const Client& client, const std::string& name, const std::string& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 341 " + client.getNickname() + " " + name + " " + channel + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_INVITING message to client" << std::endl;
 	}
 }

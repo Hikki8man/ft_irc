@@ -1,5 +1,9 @@
 #include "../includes/Channel.hpp"
 
+/******************/
+/*  Constructors  */
+/******************/
+
 Channel::Channel() : _name(""), _modes(""), _limit(0) {}
 
 Channel::Channel(const std::string& name) : _name(name), _modes(""), _limit(0) {}
@@ -22,7 +26,10 @@ Channel& Channel::operator=(const Channel& other) {
 Channel::~Channel() {}
 
 
-// getters
+/******************/
+/*     Getters    */
+/******************/
+
 const std::string Channel::getName() const {
 	return _name;
 }
@@ -35,22 +42,6 @@ std::map<SOCKET, char> &Channel::getClientsAndMod() {
 	return _clientsAndMod;
 }
 
-// const Channel::ClientAndMod &Channel::getClientAndMod(const std::string& nick) const {
-// 	for (std::map<int, Channel::ClientAndMod>::const_iterator it = _clients.begin(); it != _clients.end(); it++) {
-// 		if (it->second.client.getNickname() == nick)
-// 			return it->second;
-// 	}
-// 	return _clients.begin()->second;
-// }
-
-// const Client &Channel::findClientByName(const std::string& nick) const {
-// 	for (std::map<int, std::pair<Client&, char> >::const_iterator it = _clientsAndMod.begin(); it != _clientsAndMod.end(); it++) {
-// 		if (it->second.client.getNickname() == nick)
-// 			return it->second.client;
-// 	}
-// 	return _clients.begin()->second.client;
-// }
-
 std::string Channel::getModes() const {
 	return _modes;
 }
@@ -59,7 +50,11 @@ const int Channel::getLimit() const {
 	return _limit;
 }
 
-// setters
+
+/******************/
+/*     Setters    */
+/******************/
+
 void Channel::setName(const std::string& name) {
 	_name = name;
 }
@@ -72,6 +67,11 @@ void Channel::setLimit(const int limit) {
 	_limit = limit;
 }
 
+
+/******************/
+/*    Functions   */
+/******************/
+
 void Channel::addClient(Client& client, const std::string& key) {
 	// Check if the client is already in the channel
 	if (_clientsAndMod.find(client.getSocket()) != _clientsAndMod.end())
@@ -81,6 +81,9 @@ void Channel::addClient(Client& client, const std::string& key) {
 		return;
 	} else if (hasMode(LIMIT) && _clientsAndMod.size() >= _limit) {
 		Irc::getInstance().getServer()->send_err_channelisfull(client, _name);
+		return;
+	} else if (hasMode(INVITE_ONLY) && !isInvited(client)) {
+		Irc::getInstance().getServer()->send_err_inviteonlychan(client, _name);
 		return;
 	}
 	if (_clientsAndMod.empty())
@@ -100,10 +103,12 @@ void Channel::removePartClient(const Client& client, const std::string& reason) 
 	for (std::map<SOCKET, char>::iterator it = _clientsAndMod.begin(); it != _clientsAndMod.end(); ++it) {
 		client.sendMessage(it->first, msg);
 	}
+	removeInvite(client);
 	_clientsAndMod.erase(client.getSocket());
 }
 
 void Channel::removeQuitClient(const Client& client) {
+	removeInvite(client);
 	_clientsAndMod.erase(client.getSocket());
 }
 
@@ -117,4 +122,22 @@ void Channel::removeMode(char mode) {
 
 const bool Channel::hasMode(char mode) const {
 	return _modes.find(mode) != std::string::npos;
+}
+
+void Channel::addInvite(const Client& client) {
+	if (!isInvited(client))
+		_invites.push_back(client.getSocket());
+}
+
+void Channel::removeInvite(const Client& client) {
+	for (std::vector<SOCKET>::iterator it = _invites.begin(); it != _invites.end(); ++it) {
+		if (*it == client.getSocket()) {
+			_invites.erase(it);
+			return;
+		}
+	}
+}
+
+const bool Channel::isInvited(const Client& client) const {
+	return std::count(_invites.begin(), _invites.end(), client.getSocket()) == 1;
 }

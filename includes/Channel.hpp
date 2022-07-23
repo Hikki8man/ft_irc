@@ -8,7 +8,7 @@
 #define SECRET 's'
 #define PROTECTED_TOPIC 't'
 #define NO_EXTERNAL_MESSAGES 'n'
-#define INVITE 'i'
+#define INVITE_ONLY 'i'
 #define KEY 'k'
 #define LIMIT 'l'
 #define MODERATED 'm'
@@ -34,13 +34,15 @@ class Channel {
 		const std::string getKey() const;
 		const int getLimit() const;
 		std::map<SOCKET, char>& getClientsAndMod();
-		// const Client &findClientByName(const std::string& nick) const;
-		// const ClientAndMod &getClientAndMod(const std::string& nick) const;
 		std::string getModes() const;
 		
 		void addClient(Client&, const std::string& key = "");
 		void removePartClient(const Client&, const std::string& reason = "");
 		void removeQuitClient(const Client&);
+
+		void addInvite(const Client&);
+		void removeInvite(const Client&);
+		const bool isInvited(const Client&) const;
 
 		void addMode(char mode);
 		void removeMode(char mode);
@@ -48,7 +50,8 @@ class Channel {
 		
 	private:
 		std::string 				_name, _key;
-		std::map<SOCKET, char>	_clientsAndMod;
+		std::map<SOCKET, char>		_clientsAndMod;
+		std::vector<SOCKET>			_invites;
 		std::string					_modes;
 		int							_limit;
 };

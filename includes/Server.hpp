@@ -59,6 +59,7 @@ class Server {
 		void send_rpl_motd(const Client&, const std::string&);
 		void send_rpl_endofmotd(const Client&);
 		void send_rpl_time(const Client&, const std::string&);
+		void send_rpl_inviting(const Client&, const std::string&, const std::string&);
 
 		// Send Error Reply to client
 		void send_err_nosuchnick(const Client&, const std::string&);
@@ -79,6 +80,8 @@ class Server {
 		void send_err_chanoprivsneeded(const Client&, const std::string&);
 		void send_err_unknownmode(const Client&, const char);
 		void send_err_channelisfull(const Client&, const std::string&);
+		void send_err_inviteonlychan(const Client&, const std::string&);
+		void send_err_usernotinchannel(const Client&, const std::string&, const std::string&);
 
 		std::map<std::string, Channel>& getChannels();
 		std::map<SOCKET, Client>& getClients();

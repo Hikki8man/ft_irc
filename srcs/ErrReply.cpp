@@ -154,7 +154,25 @@ void Server::send_err_unknownmode(const Client& client, const char mode) {
 
 void Server::send_err_channelisfull(const Client& client, const std::string& channel) {
 	if (client.getPollfd().revents & POLLOUT) {
-		std::string msg = getPrefix() + " 471 " + client.getNickname() + " " + channel + " :Cannot join channel (+l)" + CRLF;
+		std::string msg = getPrefix() + " 471 " + client.getNickname() + " " + channel + " :Cannot join channel (+l) - channel is full" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
+// ========== ERR_INVITEONLYCHAN (473) ==========
+
+void Server::send_err_inviteonlychan(const Client& client, const std::string& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 473 " + client.getNickname() + " " + channel + " :Cannot join channel (+i) - you must be invited" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
+// ========== ERR_USERNOTINCHANNEL (442) ==========
+
+void Server::send_err_usernotinchannel(const Client& client, const std::string& nick, const std::string& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 442 " + client.getNickname() + " " + nick + " " + channel + " :They aren't on that channel" + CRLF;
 		send(client.getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
