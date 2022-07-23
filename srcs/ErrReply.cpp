@@ -176,3 +176,12 @@ void Server::send_err_usernotinchannel(const Client& client, const std::string& 
 		send(client.getSocket(), msg.c_str(), msg.size(), 0);
 	}
 }
+
+// ========== ERR_NOPRIVILEGES (481) ==========
+
+void Server::send_err_noprivileges(const Client& client) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 481 " + client.getNickname() + " :Permission Denied - You're not an IRC operator" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}

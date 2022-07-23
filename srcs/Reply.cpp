@@ -175,7 +175,7 @@ void Server::send_rpl_whoishost(const Client& client, const Client& user) {
 
 void Server::send_rpl_motdstart(const Client& client) {
 	if (client.getPollfd().revents & POLLOUT) {
-		std::string msg = getPrefix() + " 375 " + client.getNickname() + " :- ft_irc Message of the day - " + CRLF;
+		std::string msg = getPrefix() + " 375 " + client.getNickname() + " :- " + getIp() + " Message of the day - " + CRLF;
 		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
 		if (ret == -1)
 			std::cerr << "Error while sending RPL_MOTDSTART message to client" << std::endl;
