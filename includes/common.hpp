@@ -8,4 +8,6 @@
 
 std::vector<std::string> split(const std::string& s, const std::string& delim);
 
+std::string intToString(int i);
+
 #endif // COMMON_HPP

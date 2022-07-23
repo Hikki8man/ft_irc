@@ -34,7 +34,7 @@ void InviteCommand::execute(const Command& cmd, Client& sender) {
 	}
 
 	// if channel has invite-only mode enabled, the sender needs to be channel operator to invite someone
-	if (targetChannel->getClientsAndMod()[sender.getSocket()] != '@' && targetChannel->hasMode(INVITE_ONLY)) {
+	if (targetChannel->getClientsAndMode().at(sender.getSocket()) != OP && targetChannel->hasMode(INVITE_ONLY)) {
 		Irc::getInstance().getServer()->send_err_chanoprivsneeded(sender, targetChannelName);
 		return;
     }

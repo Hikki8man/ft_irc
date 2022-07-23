@@ -25,11 +25,11 @@ void ModeCommand::execute(const Command& cmd, Client& sender) {
 		if (args.size() == 2 || args.size() == 3) {
 			Channel* channel = &Irc::getInstance().getServer()->getChannels()[target];
 			std::string modes = args[1];
-
-			if (channel->getClientsAndMod()[sender.getSocket()] != '@') {
-				Irc::getInstance().getServer()->send_err_chanoprivsneeded(sender, target);
-				return;
-			}
+      
+      if (channel->getClientsAndMode().at(sender.getSocket()) != '@') {
+          Irc::getInstance().getServer()->send_err_chanoprivsneeded(sender, target);
+          return;
+      }
 
 			bool remove = modes.at(0) == '-';
 			std::string validModes = "stniklm";

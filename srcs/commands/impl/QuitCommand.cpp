@@ -16,13 +16,13 @@ void QuitCommand::execute(const Command& cmd, Client& sender)
 	// add all clients that need to be notified of the quit
 	for (std::map<std::string, const Channel &>::iterator it = sender.getChannels().begin(); it != sender.getChannels().end(); ++it) {
 		std::map<std::string, Channel>::iterator channel = Irc::getInstance().getServer()->getChannels().find(it->first);
-		for (std::map<int, char>::const_iterator clientIt = channel->second.getClientsAndMod().begin(); clientIt != channel->second.getClientsAndMod().end(); ++clientIt) {
+		for (std::map<int, char>::const_iterator clientIt = channel->second.getClientsAndMode().begin(); clientIt != channel->second.getClientsAndMode().end(); ++clientIt) {
 			if (clientIt->first != sender.getSocket()) {
 				clientToSendQuit[clientIt->first];
 			}
 		}
 		channel->second.removeQuitClient(sender);
-		if (channel->second.getClientsAndMod().empty())
+		if (channel->second.getClientsAndMode().empty())
 			Irc::getInstance().getServer()->getChannels().erase(channel);
 	}
 	for (std::map<SOCKET, int>::iterator it = clientToSendQuit.begin(); it != clientToSendQuit.end(); ++it) {

@@ -27,7 +27,7 @@ void PrivmsgCommand::execute(const Command& cmd, Client& sender) {
 				Irc::getInstance().getServer()->send_err_cannotsendtochan(sender, *targetIt);
 				continue;
 			}
-			for (std::map<int, char>::const_iterator clientIt = channel.getClientsAndMod().begin(); clientIt != channel.getClientsAndMod().end(); ++clientIt) {
+			for (std::map<int, char>::const_iterator clientIt = channel.getClientsAndMode().begin(); clientIt != channel.getClientsAndMode().end(); ++clientIt) {
 				if (clientIt->first != sender.getSocket()) {
 					std::string msg = "PRIVMSG " + *targetIt + " :" + args[1];
 					sender.sendMessage(clientIt->first, msg);
