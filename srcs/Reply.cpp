@@ -224,3 +224,14 @@ void Server::send_rpl_time(const Client& client, const std::string& time) {
 			std::cerr << "Error while sending RPL_TIME message to client" << std::endl;
 	}
 }
+
+// ========== RPL_INVITING (341) ==========
+
+void Server::send_rpl_inviting(const Client& client, const std::string& name, const std::string& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 341 " + client.getNickname() + " " + name + " " + channel + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_INVITING message to client" << std::endl;
+	}
+}
