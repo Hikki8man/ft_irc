@@ -27,6 +27,12 @@ void InviteCommand::execute(const Command& cmd, Client& sender) {
 	Client& targetClient = Irc::getInstance().getServer()->findClientByName(targetNick);
 	Channel *targetChannel = &Irc::getInstance().getServer()->getChannels().find(targetChannelName)->second;
 
+	// Check if sender is in the target channel
+	if (!sender.isInChannel(*targetChannel)) {
+		Irc::getInstance().getServer()->send_err_notonchannel(sender, targetChannelName);
+		return;
+	}
+
 	// if channel has invite-only mode enabled, the sender needs to be channel operator to invite someone
 	if (targetChannel->getClientsAndMod()[sender.getSocket()] != '@' && targetChannel->hasMode(INVITE_ONLY)) {
 		Irc::getInstance().getServer()->send_err_chanoprivsneeded(sender, targetChannelName);
