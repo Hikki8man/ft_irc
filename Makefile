@@ -53,7 +53,8 @@ SRCS 		+=	Command.cpp \
 				ModeCommand.cpp \
 				QuitCommand.cpp \
 				NamesCommand.cpp \
-				WhoisCommand.cpp
+				WhoisCommand.cpp \
+				MotdCommand.cpp \
 
 #===============================#
 #            HEADERS            #
@@ -77,7 +78,8 @@ HEADERS		=	Irc.hpp \
 				PingCommand.hpp \
 				PrivmsgCommand.hpp \
 				UserCommand.hpp \
-				WhoisCommand.hpp
+				WhoisCommand.hpp \
+				MotdCommand.hpp \
 
 #===============================#
 #            OBJECTS            #

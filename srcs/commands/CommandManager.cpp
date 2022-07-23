@@ -12,6 +12,7 @@
 #include "commands/impl/QuitCommand.hpp"
 #include "commands/impl/NamesCommand.hpp"
 #include "commands/impl/WhoisCommand.hpp"
+#include "commands/impl/MotdCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -27,6 +28,7 @@ CommandManager::CommandManager()
 	addCommand("QUIT", new QuitCommand());
 	addCommand("NAMES", new NamesCommand());
 	addCommand("WHOIS", new WhoisCommand());
+	addCommand("MOTD", new MotdCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)

@@ -180,3 +180,36 @@ void Server::send_rpl_whoishost(const Client& client, const Client& user) {
 			std::cerr << "Error while sending RPL_WHOISHOST message to client" << std::endl;
 	}
 }
+
+// ========== RPL_MOTDSTART (375) ==========
+
+void Server::send_rpl_motdstart(const Client& client) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 375 " + client.getNickname() + " :- ft_irc Message of the day - " + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_MOTDSTART message to client" << std::endl;
+	}
+}
+
+// ========== RPL_MOTD (372) ==========
+
+void Server::send_rpl_motd(const Client& client, const std::string& motd) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 372 " + client.getNickname() + " :" + motd + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_MOTD message to client" << std::endl;
+	}
+}
+
+// ========== RPL_ENDOFMOTD (376) ==========
+
+void Server::send_rpl_endofmotd(const Client& client) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 376 " + client.getNickname() + " :End of /MOTD command." + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_ENDOFMOTD message to client" << std::endl;
+	}
+}
