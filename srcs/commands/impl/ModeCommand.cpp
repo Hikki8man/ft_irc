@@ -95,7 +95,7 @@ void ModeCommand::execute(const Command& cmd, Client& sender) {
 		}
 
 		if (!sender.hasMode(OPERATOR)) {
-			Irc::getInstance().getServer()->send_err_noprivileges(sender, "MODE");
+			//Irc::getInstance().getServer()->send_err_noprivileges(sender, "MODE");
 			return;
 		}
 	}
