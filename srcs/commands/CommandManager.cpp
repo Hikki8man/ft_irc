@@ -14,6 +14,7 @@
 #include "commands/impl/WhoisCommand.hpp"
 #include "commands/impl/MotdCommand.hpp"
 #include "commands/impl/TimeCommand.hpp"
+#include "commands/impl/InviteCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -31,6 +32,7 @@ CommandManager::CommandManager()
 	addCommand("WHOIS", new WhoisCommand());
 	addCommand("MOTD", new MotdCommand());
 	addCommand("TIME", new TimeCommand());
+	addCommand("INVITE", new InviteCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)
