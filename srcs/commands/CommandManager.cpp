@@ -13,6 +13,7 @@
 #include "commands/impl/NamesCommand.hpp"
 #include "commands/impl/WhoisCommand.hpp"
 #include "commands/impl/MotdCommand.hpp"
+#include "commands/impl/TimeCommand.hpp"
 
 CommandManager::CommandManager()
 {
@@ -29,6 +30,7 @@ CommandManager::CommandManager()
 	addCommand("NAMES", new NamesCommand());
 	addCommand("WHOIS", new WhoisCommand());
 	addCommand("MOTD", new MotdCommand());
+	addCommand("TIME", new TimeCommand());
 }
 
 void CommandManager::addCommand(const std::string& name, CommandExecutor* command)

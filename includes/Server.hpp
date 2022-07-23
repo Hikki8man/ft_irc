@@ -58,6 +58,7 @@ class Server {
 		void send_rpl_motdstart(const Client&);
 		void send_rpl_motd(const Client&, const std::string&);
 		void send_rpl_endofmotd(const Client&);
+		void send_rpl_time(const Client&, const std::string&);
 
 		// Send Error Reply to client
 		void send_err_nosuchnick(const Client&, const std::string&);

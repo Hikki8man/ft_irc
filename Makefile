@@ -55,6 +55,7 @@ SRCS 		+=	Command.cpp \
 				NamesCommand.cpp \
 				WhoisCommand.cpp \
 				MotdCommand.cpp \
+				TimeCommand.cpp \
 
 #===============================#
 #            HEADERS            #
@@ -80,6 +81,7 @@ HEADERS		=	Irc.hpp \
 				UserCommand.hpp \
 				WhoisCommand.hpp \
 				MotdCommand.hpp \
+				TimeCommand.hpp \
 
 #===============================#
 #            OBJECTS            #

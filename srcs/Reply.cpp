@@ -213,3 +213,14 @@ void Server::send_rpl_endofmotd(const Client& client) {
 			std::cerr << "Error while sending RPL_ENDOFMOTD message to client" << std::endl;
 	}
 }
+
+// ========== RPL_TIME (391) ==========
+
+void Server::send_rpl_time(const Client& client, const std::string& time) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 391 " + client.getNickname() + " :" + time + CRLF;
+		int ret = send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		if (ret == -1)
+			std::cerr << "Error while sending RPL_TIME message to client" << std::endl;
+	}
+}
