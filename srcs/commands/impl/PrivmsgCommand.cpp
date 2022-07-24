@@ -26,6 +26,10 @@ void PrivmsgCommand::execute(const Command& cmd, Client& sender) {
 			if (!sender.isInChannel(channel) && channel.hasMode(NO_EXTERNAL_MESSAGES)) {
 				Irc::getInstance().getServer()->send_err_cannotsendtochan(sender, *targetIt);
 				continue;
+			// if channel has moderated mode enabled and sender doesnt have voice or op channel mode, send error
+			} else if (channel.hasMode(MODERATED) && channel.getClientsAndMode().at(sender.getSocket()) == NONE) {
+				Irc::getInstance().getServer()->send_err_cannotsendtochan(sender, *targetIt);
+				continue;
 			}
 			for (std::map<int, char>::const_iterator clientIt = channel.getClientsAndMode().begin(); clientIt != channel.getClientsAndMode().end(); ++clientIt) {
 				if (clientIt->first != sender.getSocket()) {

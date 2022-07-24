@@ -14,7 +14,8 @@
 #define LIMIT 'l'
 #define MODERATED 'm'
 
-#define OP '@'
+#define CHANNEL_OP '@'
+#define CHANNEL_VOICE '+'
 #define NONE '\0'
 
 #define SOCKET int
@@ -34,6 +35,7 @@ class Channel {
 		void setKey(const std::string& key);
 		void setLimit(const int limit);
 		void setTopic(const Client& client, const std::string& topic);
+		void setClientMode(const Client& client, const char mode);
 
 		const std::string getName() const;
 		const std::string getKey() const;
