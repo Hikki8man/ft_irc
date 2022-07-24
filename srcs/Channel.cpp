@@ -121,11 +121,15 @@ void Channel::addClient(Client& client, const std::string& key) {
 		return;
 	}
 	if (_clientsAndMode.empty())
-		_clientsAndMode.insert(std::make_pair(client.getSocket(), '@'));
+		_clientsAndMode.insert(std::make_pair(client.getSocket(), OP));
 	else
-		_clientsAndMode.insert(std::make_pair(client.getSocket(), '\0'));
+		_clientsAndMode.insert(std::make_pair(client.getSocket(), NONE));
 	for (std::map<SOCKET, char>::iterator it = _clientsAndMode.begin(); it != _clientsAndMode.end(); ++it)
 		client.sendMessage(it->first, std::string ("JOIN ") + _name);
+	if (!_topic.empty()) {
+		Irc::getInstance().getServer()->send_rpl_topic(client, *this);
+		Irc::getInstance().getServer()->send_rpl_topicwhotime(client, *this);
+	}
 	Irc::getInstance().getServer()->send_rpl_namreply(client, *this);
 	Irc::getInstance().getServer()->send_rpl_endofnames(client, *this);
 }
