@@ -177,6 +177,14 @@ void Server::send_err_usernotinchannel(const Client& client, const std::string& 
 	}
 }
 
+// ========== ERR_USERONCHANNEL (443) ==========
+void Server::send_err_useronchannel(const Client& client, const std::string& nick, const std::string& channel) {
+	if (client.getPollfd().revents & POLLOUT) {
+		std::string msg = getPrefix() + " 443 " + client.getNickname() + " " + nick + " " + channel + " :is already on channel" + CRLF;
+		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+	}
+}
+
 // ========== ERR_NOPRIVILEGES (481) ==========
 
 void Server::send_err_noprivileges(const Client& client) {

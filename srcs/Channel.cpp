@@ -126,27 +126,30 @@ void Channel::addClient(Client& client, const std::string& key) {
 		_clientsAndMode.insert(std::make_pair(client.getSocket(), NONE));
 	for (std::map<SOCKET, char>::iterator it = _clientsAndMode.begin(); it != _clientsAndMode.end(); ++it)
 		client.sendMessage(it->first, std::string ("JOIN ") + _name);
+	if (!_topic.empty()) {
+		Irc::getInstance().getServer()->send_rpl_topic(client, *this);
+		Irc::getInstance().getServer()->send_rpl_topicwhotime(client, *this);
+	}
 	Irc::getInstance().getServer()->send_rpl_namreply(client, *this);
 	Irc::getInstance().getServer()->send_rpl_endofnames(client, *this);
 }
 
-void Channel::removePartClient(const Client& client, const std::string& reason) {
-	std::string msg = "PART " + _name; + " :" + reason;
-	if (reason.empty())
-		msg += " :" + reason;
-	for (std::map<SOCKET, char>::iterator it = _clientsAndMode.begin(); it != _clientsAndMode.end(); ++it) {
-		client.sendMessage(it->first, msg);
+void Channel::removeClient(const Client& client, const std::string& cmd, const std::string& reason) {
+	if (cmd == "PART")
+	{
+		std::string msg = " " + cmd + " " + _name + " :" + reason;
+		if (reason.empty())
+			msg += " :" + reason;
+		for (std::map<SOCKET, char>::iterator it = _clientsAndMode.begin(); it != _clientsAndMode.end(); ++it) {
+			client.sendMessage(it->first, msg);
+		}
 	}
+	removeInvite(client);
 	_clientsAndMode.erase(client.getSocket());
 }
 
 void Channel::insertClient(std::pair<SOCKET, char> client) {
 	_clientsAndMode.insert(client);
-}
-
-void Channel::removeQuitClient(const Client& client) {
-	removeInvite(client);
-	_clientsAndMode.erase(client.getSocket());
 }
 
 void Channel::addMode(char mode) {

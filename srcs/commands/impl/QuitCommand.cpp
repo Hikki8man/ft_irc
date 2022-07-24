@@ -21,7 +21,7 @@ void QuitCommand::execute(const Command& cmd, Client& sender)
 				clientToSendQuit[clientIt->first];
 			}
 		}
-		channel->second.removeQuitClient(sender);
+		channel->second.removeClient(sender, cmd.getName(), reason);
 		if (channel->second.getClientsAndMode().empty())
 			Irc::getInstance().getServer()->getChannels().erase(channel);
 	}
