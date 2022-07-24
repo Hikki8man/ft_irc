@@ -47,9 +47,7 @@ class Channel {
 		void clearTopic();
 		void addClient(Client&, const std::string& key = "");
 		void insertClient(std::pair<SOCKET, char>);
-		void removePartClient(const Client&, const std::string& reason = "");
-		void removeQuitClient(const Client&);
-
+		void removeClient(const Client&, const std::string& cmd, const std::string& reason = "");
 		void addInvite(const Client&);
 		void removeInvite(const Client&);
 		const bool isInvited(const Client&) const;

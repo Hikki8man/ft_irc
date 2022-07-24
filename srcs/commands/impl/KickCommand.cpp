@@ -20,6 +20,12 @@ void KickCommand::execute(const Command& cmd, Client& sender) {
 	
 	Channel *targetChannel = &Irc::getInstance().getServer()->getChannels().find(targetChannelName)->second;
 
+	// Check if client is in the target channel
+	if (!sender.isInChannel(*targetChannel)) {
+		Irc::getInstance().getServer()->send_err_notonchannel(sender, targetChannelName);
+		return;
+	}
+
 	// Check if sender is channel operator
 	if (targetChannel->getClientsAndMode().at(sender.getSocket()) != OP) {
 		Irc::getInstance().getServer()->send_err_chanoprivsneeded(sender, targetChannelName);
@@ -43,16 +49,15 @@ void KickCommand::execute(const Command& cmd, Client& sender) {
 		}
 
 		// Remove client from channel
-		targetChannel->removeQuitClient(targetClient);
-		targetClient.removeChannel(*targetChannel);
-
-		// Send kick message
-		if (args.size() == 3) {
-			targetClient.sendMessage(targetClient, "KICK " + targetChannelName + " " + *it + " :" + args[2]);
-			sender.sendMessage(sender, "KICK " + targetChannelName + " " + *it + " :" + args[2]);
-		} else {
-			targetClient.sendMessage(targetClient, "KICK " + targetChannelName + " " + *it);
-			sender.sendMessage(sender, "KICK " + targetChannelName + " " + *it);
+		std::string reason = *it;
+		if (args.size() > 2) {
+			reason = args[2];
 		}
+		std::string msg = "KICK " + targetChannelName + " " + *it + " :" + reason;
+		for (std::map<SOCKET, char>::const_iterator clientIt = targetChannel->getClientsAndMode().begin(); clientIt != targetChannel->getClientsAndMode().end(); ++clientIt)
+			sender.sendMessage(clientIt->first, msg);
+	
+		targetChannel->removeClient(targetClient, cmd.getName(), reason);
+		targetClient.removeChannel(*targetChannel);
 	}
 }
