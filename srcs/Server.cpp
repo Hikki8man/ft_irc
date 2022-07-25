@@ -1,7 +1,6 @@
 #include "../includes/Server.hpp"
 #include "Irc.hpp"
 #include "commands/CommandExecutor.hpp"
-#include <iostream>
 
 Server::Server() : _password("") {}
 
@@ -12,7 +11,9 @@ Server& Server::operator=(const Server&) {
 }
 
 Server::~Server() {
-	// TODO close all clients
+	for (SocketIt it = _sockets.begin(); it != _sockets.end(); ++it) {
+		close(it->fd);
+	}
 }
 
 bool Server::nickIsUsed(const std::string& nick) {

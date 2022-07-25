@@ -31,7 +31,7 @@ void TopicCommand::execute(const Command& cmd, Client& sender)
 				Irc::getInstance().getServer()->send_err_notonchannel(sender, *it);
 				continue;
 			}
-			else if (channel->second.hasMode(PROTECTED_TOPIC) && channel->second.getClientMode(sender.getSocket()) != OP) {
+			else if (channel->second.hasMode(PROTECTED_TOPIC) && channel->second.getClientMode(sender.getSocket()) != CHANNEL_OP) {
 				Irc::getInstance().getServer()->send_err_chanoprivsneeded(sender, *it);
 				continue;
 			}
