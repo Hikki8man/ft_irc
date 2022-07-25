@@ -261,6 +261,7 @@ int Server::run(int port) {
 		else if (pollRet > 0) {
 			for (SocketIt it = _sockets.begin(); it != _sockets.end(); ++it) {
 				if (it->fd != _srv_fd && _clients.find(it->fd) == _clients.end()) {
+					close(it->fd);
 					_sockets.erase(it);
 					break;
 				}
