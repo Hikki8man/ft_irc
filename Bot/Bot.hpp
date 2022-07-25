@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #include <string>
 
-#define SOCKET int
+#define CRLF "\r\n"
 
 class Bot {
 	public:
