@@ -6,6 +6,7 @@ Bot::Bot(const std::string& serverAddress, const int& port, const std::string& p
 	_nick = "Bot";
 	_user = "Bot";
 	_realName = "Bot";
+	srand(time(NULL));
 }
 
 Bot::Bot(const Bot& bot) {
@@ -98,25 +99,40 @@ int Bot::run() {
 	return EXIT_SUCCESS;
 }
 
-void Bot::parseCommand(const std::string &message) {
+void Bot::parseCommand(const std::string &msg) {
+	std::string message = msg.substr(0, msg.size() - 2);
 	std::string commandName = message.substr(message.find_first_of(" ") + 1);
-	std::string commandArg = commandName.substr(commandName.find_first_of(":") + 1);
+	std::string commandArg;
+	if (commandName.find(":") != std::string::npos)
+		commandArg = commandName.substr(commandName.find_first_of(":") + 1);
+	else
+		commandArg = commandName.substr(commandName.find_first_of(" ") + 1);
 	commandName = commandName.substr(0, commandName.find_first_of(" "));
 	std::string commandSender = message.substr(1, message.find_first_of("!") -1);
 
 	std::cout << commandName << std::endl;
 	std::cout << commandArg << std::endl;
 	std::cout << commandSender << std::endl;
+	runCommand(commandSender, commandName, commandArg);
 }
 
 void Bot::runCommand(const std::string& sender, const std::string& command, const std::string& args) {
+	std::cout << "Command: '" << command << "' Sender: '" << sender << "' arg: '" << args << "'" << std::endl;
 	if (command == "JOIN") {
 		if (sender == _nick) {
-			std::string message = "PRIVMSG " + args + " :Heu salut c'est le bot merci pour l'invite mon reuf !\r\n";
+			std::string message = "PRIVMSG " + args + " :Heu salut c'est le bot merci pour l'invite mon reuf !" + CRLF;
 			sendMessage(message);
 		} else {
-			std::string message = "PRIVMSG " + args + " :Slt " + sender + " le couz bienvenue dans " + args + "\r\n";
+			std::string message = "PRIVMSG " + args + " :Slt " + sender + " le couz bienvenue dans " + args + CRLF;
 			sendMessage(message);
 		}
+	} else if (command == "INVITE") {
+		std::cout << "Invitation" << std::endl;
+		sendMessage("JOIN " + args + CRLF);
+	} else if (command == "KICK") {
+		// TODO une chance sur deux qu'il revienne dans le channel
+		sendMessage("PRIVMSG " + sender + " :Attend que je t'attrape toi ptit batard" + CRLF);
+	} else if (command == "PART" || command == "QUIT") {
+		// TODO envoyer un message mais il faut le nom du channel
 	}
 }

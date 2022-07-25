@@ -11,6 +11,8 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <string>
+#include <stdlib.h>
+#include <time.h>
 
 #define CRLF "\r\n"
 
