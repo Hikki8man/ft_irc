@@ -27,7 +27,7 @@ void KickCommand::execute(const Command& cmd, Client& sender) {
 	}
 
 	// Check if sender is channel operator
-	if (targetChannel->getClientsAndMode().at(sender.getSocket()) != OP) {
+	if (targetChannel->getClientsAndMode().at(sender.getSocket()) != CHANNEL_OP) {
 		Irc::getInstance().getServer()->send_err_chanoprivsneeded(sender, targetChannelName);
 		return;
 	}
