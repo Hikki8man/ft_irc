@@ -53,10 +53,6 @@ class Client {
 		void sendMessage(int toSend, const std::string& message, bool prefix = true) const;
 		void sendMessage(Client &toSend, const std::string& message, bool prefix = true) const;
 
-		void addMode(char mode);
-		void removeMode(char mode);
-		const bool hasMode(char mode) const;
-
 	private:
 		bool _registered;
 		bool _logged;
@@ -64,7 +60,7 @@ class Client {
 		struct sockaddr_in _addr;
 
 		std::map<std::string, const Channel&> _channels;
-		std::string _nick, _user, _realName, _bufferStocked, _prefix, _ip, _modes;
+		std::string _nick, _user, _realName, _bufferStocked, _prefix, _ip;
 };
 
 #endif

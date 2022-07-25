@@ -1,9 +1,9 @@
 #include "../includes/Client.hpp"
 #include "Irc.hpp"
 
-Client::Client() : _socket(), _addr(), _registered(false), _modes("") {}
+Client::Client() : _socket(), _addr(), _registered(false) {}
 
-Client::Client(int socket, struct sockaddr_in addr) : _socket(socket), _addr(addr), _registered(false), _modes("") {}
+Client::Client(int socket, struct sockaddr_in addr) : _socket(socket), _addr(addr), _registered(false) {}
 
 Client::Client(const Client& other) {
 	*this = other;
@@ -21,7 +21,6 @@ Client& Client::operator=(const Client& other) {
 		_channels = other._channels;
 		_prefix = other._prefix;
 		_ip = other._ip;
-		_modes = other._modes;
 	}
 	return *this;
 }
@@ -153,16 +152,4 @@ void Client::sendMessage(Client &toSendTo, const std::string& args, bool prefix)
 		if (ret == -1)
 			std::cerr << "Error while sending " << msg.substr(0, msg.find_first_of(" ")) << " message to " << toSendTo.getIp() << std::endl;
 	}
-}
-
-void Client::addMode(char mode) {
-	_modes.push_back(mode);
-}
-
-void Client::removeMode(char mode) {
-	_modes.erase(_modes.find(mode), 1);
-}
-
-const bool Client::hasMode(char mode) const {
-	return _modes.find(mode) != std::string::npos;
 }
