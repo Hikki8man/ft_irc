@@ -53,10 +53,6 @@ int Bot::connectToServer() {
 	_pollfd.events = POLLIN | POLLOUT;
 	// Connect
 	connect(_pollfd.fd, (struct sockaddr*)&_addr, sizeof(_addr));
-	// if (connect(_pollfd.fd, (struct sockaddr*)&_addr, sizeof(_addr)) == -1) {
-	// 	perror("connect");
-	// 	return EXIT_FAILURE;
-	// }
 	return 0;
 }
 
@@ -65,7 +61,7 @@ int Bot::run() {
 	while (1) {
 		int pollRet = poll(&_pollfd, 1, 0);
 
-		if (pollRet < 0) { // handle errors
+		if (pollRet < 0) {
 			perror("poll");
 			break;
 		}
@@ -88,12 +84,12 @@ int Bot::run() {
 				}
 			}
 			else if (_pollfd.revents & POLLOUT && !isRegistered) {
-				std::string message = "PASS " + _password + "\r\n";
+				std::string message = "PASS " + _password + CRLF;
 				if (!_password.empty())
 					sendMessage(message);
-				message = "NICK " + _nick + "\r\n";
+				message = "NICK " + _nick + CRLF;
 				sendMessage(message);
-				message = "USER " + _user + " 0 * :" + _realName + "\r\n";
+				message = "USER " + _user + " 0 * :" + _realName + CRLF;
 				sendMessage(message);
 				isRegistered = true;
 			}
