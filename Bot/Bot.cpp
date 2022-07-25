@@ -114,5 +114,13 @@ void Bot::parseCommand(const std::string &message) {
 }
 
 void Bot::runCommand(const std::string& sender, const std::string& command, const std::string& args) {
-	
+	if (command == "JOIN") {
+		if (sender == _nick) {
+			std::string message = "PRIVMSG " + args + " :Heu salut c'est le bot merci pour l'invite mon reuf !\r\n";
+			sendMessage(message);
+		} else {
+			std::string message = "PRIVMSG " + args + " :Slt " + sender + " le couz bienvenue dans " + args + "\r\n";
+			sendMessage(message);
+		}
+	}
 }
