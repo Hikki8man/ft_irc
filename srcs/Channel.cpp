@@ -121,7 +121,7 @@ void Channel::addClient(Client& client, const std::string& key) {
 		return;
 	}
 	if (_clientsAndMode.empty())
-		_clientsAndMode.insert(std::make_pair(client.getSocket(), OP));
+		_clientsAndMode.insert(std::make_pair(client.getSocket(), CHANNEL_OP));
 	else
 		_clientsAndMode.insert(std::make_pair(client.getSocket(), NONE));
 	for (std::map<SOCKET, char>::iterator it = _clientsAndMode.begin(); it != _clientsAndMode.end(); ++it)
@@ -180,4 +180,8 @@ void Channel::removeInvite(const Client& client) {
 
 const bool Channel::isInvited(const Client& client) const {
 	return std::count(_invites.begin(), _invites.end(), client.getSocket()) == 1;
+}
+
+void Channel::setClientMode(const Client& client, char mode) {
+	_clientsAndMode[client.getSocket()] = mode;
 }
