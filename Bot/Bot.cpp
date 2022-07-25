@@ -76,6 +76,7 @@ int Bot::run() {
 				if (n > 0) {
 					std::string message(buffer);
 					std::cout << message << std::endl;
+					parseCommand(message);
 				}
 				else if (n == 0) {
 					std::cerr << "Connection closed" << std::endl;
@@ -101,3 +102,15 @@ int Bot::run() {
 	return EXIT_SUCCESS;
 }
 
+void Bot::parseCommand(const std::string &message) {
+	std::string commandName = message.substr(message.find_first_of(" ") + 1);
+	std::string commandArg = commandName.substr(commandName.find_first_of(":") + 1);
+	commandName = commandName.substr(0, commandName.find_first_of(" "));
+
+	std::cout << commandName << std::endl;
+	std::cout << commandArg << std::endl;
+}
+
+void Bot::runCommand(const std::string& command, const std::string& args) {
+	
+}
