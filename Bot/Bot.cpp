@@ -106,11 +106,13 @@ void Bot::parseCommand(const std::string &message) {
 	std::string commandName = message.substr(message.find_first_of(" ") + 1);
 	std::string commandArg = commandName.substr(commandName.find_first_of(":") + 1);
 	commandName = commandName.substr(0, commandName.find_first_of(" "));
+	std::string commandSender = message.substr(1, message.find_first_of("!") -1);
 
 	std::cout << commandName << std::endl;
 	std::cout << commandArg << std::endl;
+	std::cout << commandSender << std::endl;
 }
 
-void Bot::runCommand(const std::string& command, const std::string& args) {
+void Bot::runCommand(const std::string& sender, const std::string& command, const std::string& args) {
 	
 }
