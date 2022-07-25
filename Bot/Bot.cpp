@@ -2,7 +2,11 @@
 
 Bot::Bot() {}
 
-Bot::Bot(const std::string& serverAddress, const int& port, const std::string& password) : _serverAddress(serverAddress), _password(password), _port(port) {}
+Bot::Bot(const std::string& serverAddress, const int& port, const std::string& password) : _serverAddress(serverAddress), _password(password), _port(port) {
+	_nick = "Bot";
+	_user = "Bot";
+	_realName = "Bot";
+}
 
 Bot::Bot(const Bot& bot) {
 	*this = bot;
@@ -57,8 +61,43 @@ int Bot::connectToServer() {
 }
 
 int Bot::run() {
+	bool isRegistered = false;
 	while (1) {
-		
+		int pollRet = poll(&_pollfd, 1, 0);
+
+		if (pollRet < 0) { // handle errors
+			perror("poll");
+			break;
+		}
+		else if (pollRet > 0) {
+			if (_pollfd.revents & POLLIN) {
+				char buffer[1024] = {0};
+				int n = recv(_pollfd.fd, buffer, 1024, 0);
+				if (n > 0) {
+					std::string message(buffer);
+					std::cout << message << std::endl;
+				}
+				else if (n == 0) {
+					std::cerr << "Connection closed" << std::endl;
+					break;
+				}
+				else {
+					perror("recv");
+					break;
+				}
+			}
+			else if (_pollfd.revents & POLLOUT && !isRegistered) {
+				std::string message = "PASS " + _password + "\r\n";
+				if (!_password.empty())
+					sendMessage(message);
+				message = "NICK " + _nick + "\r\n";
+				sendMessage(message);
+				message = "USER " + _user + " 0 * :" + _realName + "\r\n";
+				sendMessage(message);
+				isRegistered = true;
+			}
+		}
 	}
+	return EXIT_SUCCESS;
 }
 
