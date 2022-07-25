@@ -46,5 +46,5 @@ void InviteCommand::execute(const Command& cmd, Client& sender) {
     }
 
 	targetChannel->addInvite(targetClient);
-	targetClient.sendMessage(targetClient,  "INVITE " + targetNick + " :" + targetChannelName);
+	sender.sendMessage(targetClient,  "INVITE " + targetNick + " :" + targetChannelName);
 }
