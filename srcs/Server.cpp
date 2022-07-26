@@ -72,7 +72,7 @@ const SOCKET Server::getSocket() const {
 // Setter ===========================================================================
 
 void Server::setPrefix() {
-	_prefix = std::string(":") + inet_ntoa(_srv_addr.sin_addr);
+	_prefix = std::string(":") + _srv_ip;
 }
 
 void Server::setPassword(const std::string& password) {
@@ -181,7 +181,7 @@ int Server::createServerSocket(int port) {
 	pollfd serverSocket;
 	serverSocket.fd = _srv_fd;
 	serverSocket.events = POLLIN;
-	_srv_ip = inet_ntoa(_srv_addr.sin_addr);
+	_srv_ip = SERVER_ADDR;
 	_sockets.push_back(serverSocket);
 	setPrefix();
 
@@ -206,8 +206,6 @@ int Server::newConnection() {
 	newSocket.events = POLLIN | POLLOUT;
 	_sockets.push_back(newSocket);
 
-	
-
 	// Add new client to clients list
 	Client newClient(new_socket, client_addr);
 	newClient.setIp(inet_ntoa(client_addr.sin_addr));
@@ -224,7 +222,6 @@ int Server::recvMsgFrom(SocketIt socket) {
 	int n;
 	if ((n = recv(socket->fd, buffer, BUFFER_MAX - 2, 0)) < 0) {
 		_clients.erase(socket->fd);
-		_sockets.erase(socket);
 		perror("recv");
 		return 0;
 	}
@@ -236,7 +233,7 @@ int Server::recvMsgFrom(SocketIt socket) {
 		sender.setBuffer("QUIT :Remote host closed the connection\r\n");
 		CommandExecutor *executor = cmd.parse(sender.getBuffer());
 		executor->execute(cmd, sender);
-		_sockets.erase(socket);
+		_clients.erase(socket->fd);
 		return 0;
 	}
 	std::string buf(buffer);
@@ -261,12 +258,12 @@ int Server::run(int port) {
 		}
 		else if (pollRet > 0) {
 			for (SocketIt it = _sockets.begin(); it != _sockets.end(); ++it) {
-				if (it->fd != _srv_fd && _clients.find(it->fd) == _clients.end()) {
+				if ((it->fd != _srv_fd && _clients.find(it->fd) == _clients.end()) || it->revents & POLLERR) {
 					close(it->fd);
 					_sockets.erase(it);
 					break;
 				}
-				if (it->revents & POLLIN) {
+				else if (it->revents & POLLIN) {
 					if (it->fd == _srv_fd) {
 						newConnection();
 						break;

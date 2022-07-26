@@ -13,12 +13,14 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <netdb.h>
 
 #define SOCKET int
 #define SocketIt std::vector<pollfd>::iterator
 #define ClientIt std::map<SOCKET, Client>::iterator
 
 #define CRLF "\r\n"
+#define SERVER_ADDR "irc.42.fr"
 #define BUFFER_MAX 512
 #define USERLEN 18
 #define NICKLEN 31
