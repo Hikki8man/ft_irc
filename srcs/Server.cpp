@@ -2,6 +2,10 @@
 #include "Irc.hpp"
 #include "commands/CommandExecutor.hpp"
 
+/******************/
+/*  Constructors  */
+/******************/
+
 Server::Server() : _password("") {}
 
 Server::Server(const Server&) {}
@@ -24,7 +28,10 @@ bool Server::nickIsUsed(const std::string& nick) {
 	return false;
 }
 
-// Getter ===========================================================================
+
+/******************/
+/*     Getters    */
+/******************/
 
 std::vector<pollfd>& Server::getPollfds() {
 	return _sockets;
@@ -69,7 +76,9 @@ const SOCKET Server::getSocket() const {
 	return _srv_fd;
 }
 
-// Setter ===========================================================================
+/******************/
+/*     Setters    */
+/******************/
 
 void Server::setPrefix() {
 	_prefix = std::string(":") + inet_ntoa(_srv_addr.sin_addr);
@@ -79,7 +88,10 @@ void Server::setPassword(const std::string& password) {
 	_password = password;
 }
 
-// Methods ==========================================================================
+
+/******************/
+/*    Functions   */
+/******************/
 
 void Server::sendMessage(int toSend, const std::string& args, bool prefix) const {
 	Client& toSendTo = Irc::getInstance().getServer()->getClientBySocket(toSend);
