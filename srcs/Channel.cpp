@@ -137,7 +137,7 @@ void Channel::addClient(Client& client, const std::string& key) {
 void Channel::removeClient(const Client& client, const std::string& cmd, const std::string& reason) {
 	if (cmd == "PART")
 	{
-		std::string msg = " " + cmd + " " + _name + " :" + reason;
+		std::string msg = cmd + " " + _name + " :" + reason;
 		if (reason.empty())
 			msg += " :" + reason;
 		for (std::map<SOCKET, char>::iterator it = _clientsAndMode.begin(); it != _clientsAndMode.end(); ++it) {

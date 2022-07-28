@@ -1,6 +1,10 @@
 #include "../includes/Client.hpp"
 #include "Irc.hpp"
 
+/******************/
+/*  Constructors  */
+/******************/
+
 Client::Client() : _socket(), _addr(), _registered(false) {}
 
 Client::Client(int socket, struct sockaddr_in addr) : _socket(socket), _addr(addr), _registered(false) {}
@@ -27,7 +31,11 @@ Client& Client::operator=(const Client& other) {
 
 Client::~Client() {}
 
-// GETTERS
+
+/******************/
+/*     Getters    */
+/******************/
+
 int Client::getSocket() const {
 	return _socket;
 }
@@ -73,7 +81,11 @@ const std::string Client::getIp() const {
 	return _ip;
 }
 
-// SETTERS
+
+/******************/
+/*     Setters    */
+/******************/
+
 void Client::setNickname(const std::string& nick) {
 	_nick = nick;
 }
@@ -102,7 +114,10 @@ void Client::setIp(const std::string& ip) {
 	_ip = ip;
 }
 
-// Methods
+
+/******************/
+/*    Functions   */
+/******************/
 
 bool Client::isRegistered() const {
 	return _registered && isLogged();
@@ -122,7 +137,6 @@ bool Client::isInChannel(const Channel& channel) const {
 
 void Client::addChannel(const Channel& channel) {
 	_channels.insert(std::make_pair(channel.getName(), channel));
-	// _channels[channel.getName()] = channel;
 }
 
 void Client::removeChannel(Channel& channel) {
