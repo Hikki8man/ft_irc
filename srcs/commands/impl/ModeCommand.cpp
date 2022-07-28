@@ -86,8 +86,9 @@ void ModeCommand::execute(const Command& cmd, Client& sender) {
                     modes = modes.replace(0, 1, "+");
 
                 // send message to sender and target client
-                sender.sendMessage(sender, "MODE " + target + " " + modes + " " + args[2]);
-                sender.sendMessage(targetClient, "MODE " + target + " " + modes + " " + args[2]);
+                for (std::map<int, char>::const_iterator clientIt = channel->getClientsAndMode().begin(); clientIt !=               channel->getClientsAndMode().end(); ++clientIt) {
+                    sender.sendMessage(clientIt->first, "MODE " + target + " " + modes + " " + args[2]);
+                }
                 return;
             }
 
