@@ -24,7 +24,17 @@ void NickCommand::execute(const Command& cmd, Client& sender)
 	if (Irc::getInstance().getServer()->nickIsUsed(nick)) {
 		Irc::getInstance().getServer()->send_err_nicknameinuse(sender, nick);
 	} else {
-		sender.setNickname(nick);
+		if (sender.getNickname().empty())
+			sender.setNickname(nick);
+		else {
+			sender.setNickname(nick);
+			for (std::map<std::string, const Channel &>::iterator it = sender.getChannels().begin(); it != sender.getChannels().end(); ++it) {
+				std::map<std::string, Channel>::iterator channel = Irc::getInstance().getServer()->getChannels().find(it->first);
+				for (std::map<int, char>::const_iterator clientIt = channel->second.getClientsAndMode().begin(); clientIt != channel->second.getClientsAndMode().end(); ++clientIt) {
+					sender.sendMessage(clientIt->first, "NICK :" + nick);
+				}
+			}
+		}
 		sender.setPrefix();
 	}
 }
