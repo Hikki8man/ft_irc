@@ -4,7 +4,7 @@ Bot::Bot() {}
 
 Bot::Bot(const std::string& serverAddress, const int& port, const std::string& password) : _serverAddress(serverAddress), _password(password), _port(port) {
 	int randy = rand() % 4;
-	std::string names[] = {"Loïc", "Johan", "Chafik", "Beco"};
+	std::string names[] = { "lolo", "jojo", "chacos", "kobe" };
 	_nick = "Bot_" + names[randy];
 	_user = "Bot";
 	_realName = "Bot";
