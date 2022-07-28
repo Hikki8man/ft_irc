@@ -34,7 +34,7 @@ void ModeCommand::execute(const Command& cmd, Client& sender) {
 
         std::cout << "remove: " << remove << std::endl;
         
-        for (int i = 1; i < modes.size(); i++) {
+        for (size_t i = 1; i < modes.size(); i++) {
             char mode = modes.at(i);
             if (validModes.find(mode) == std::string::npos) {
                 modes.erase(modes.find(mode), 1); // remove invalid mode from modes string so it doesn't appear in the reply

@@ -1,6 +1,7 @@
 #include "Bot.hpp"
 
 int main(int ac, char **av) {
+	srand(time(NULL));
 	if (ac < 3 || ac > 4) {
 		std::cerr << "Usage: " << av[0] << " <server address> <port> <password>" << std::endl;
 		return EXIT_FAILURE;

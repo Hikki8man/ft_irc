@@ -132,7 +132,6 @@ void Bot::runCommand(const std::string& sender, const std::string& command, cons
 	} else if (command == "INVITE") {
 		sendMessage("JOIN " + args + CRLF);
 	} else if (command == "KICK") {
-		srand(time(NULL));
 		int rdm = rand();
 		std::cout << "random: " << rdm << std::endl;
 		if (rdm % 2 == 0) {

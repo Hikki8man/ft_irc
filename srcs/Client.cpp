@@ -5,9 +5,9 @@
 /*  Constructors  */
 /******************/
 
-Client::Client() : _socket(), _addr(), _registered(false) {}
+Client::Client() : _registered(false), _socket(), _addr() {}
 
-Client::Client(int socket, struct sockaddr_in addr) : _socket(socket), _addr(addr), _registered(false) {}
+Client::Client(int socket, struct sockaddr_in addr) : _registered(false), _socket(socket), _addr(addr) {}
 
 Client::Client(const Client& other) {
 	*this = other;
@@ -127,7 +127,7 @@ void Client::setLogged(bool logged) {
 	_logged = logged;
 }
 
-const bool Client::isLogged() const {
+bool Client::isLogged() const {
 	return _logged || Irc::getInstance().getServer()->getPassword().length() == 0;
 }
 

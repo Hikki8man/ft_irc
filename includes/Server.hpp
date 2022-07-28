@@ -93,7 +93,7 @@ class Server {
 		const std::string getPrefix() const;
 		const std::string getIp() const;
 		const std::string getPassword() const;
-		const SOCKET getSocket() const;
+		SOCKET getSocket() const;
 
 		void setPassword(const std::string& password);
 	private:
