@@ -6,7 +6,6 @@ Bot::Bot(const std::string& serverAddress, const int& port, const std::string& p
 	_nick = "Bot";
 	_user = "Bot";
 	_realName = "Bot";
-	srand(time(NULL));
 }
 
 Bot::Bot(const Bot& bot) {
@@ -126,18 +125,21 @@ void Bot::parseCommand(const std::string &msg) {
 void Bot::runCommand(const std::string& sender, const std::string& command, const std::string& args, const std::string& channel) {
 	std::cout << "Command: '" << command << "' Sender: '" << sender << "' arg: '" << args << "'" << std::endl;
 	if (command == "JOIN") {
-		if (sender == _nick) {
-			std::string message = "PRIVMSG " + args + " :Heu salut c'est le bot merci pour l'invite mon reuf !" + CRLF;
-			sendMessage(message);
-		} else {
+		if (sender != _nick) {
 			std::string message = "PRIVMSG " + args + " :Slt " + sender + " le couz bienvenue dans " + args + CRLF;
 			sendMessage(message);
 		}
 	} else if (command == "INVITE") {
 		sendMessage("JOIN " + args + CRLF);
 	} else if (command == "KICK") {
-		// TODO une chance sur deux qu'il revienne dans le channel
-		sendMessage("PRIVMSG " + sender + " :Attend que je t'attrape toi ptit batard" + CRLF);
+		srand(time(NULL));
+		int rdm = rand();
+		std::cout << "random: " << rdm << std::endl;
+		if (rdm % 2 == 0) {
+			sendMessage("JOIN " + channel + CRLF);
+			sendMessage("PRIVMSG " + channel + " :Tu croyais pouvoir te débarasser de moi comme ça ? " + CRLF);
+		} else
+			sendMessage("PRIVMSG " + sender + " :Attend que je t'attrape toi ptit batard" + CRLF);
 	} else if (command == "PART") {
 		std::string message = "PRIVMSG " + channel + " :Ah bah ok le reuf " + sender + " s'est barré super..." + CRLF;
 		sendMessage(message);
