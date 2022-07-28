@@ -3,7 +3,9 @@
 Bot::Bot() {}
 
 Bot::Bot(const std::string& serverAddress, const int& port, const std::string& password) : _serverAddress(serverAddress), _password(password), _port(port) {
-	_nick = "Bot";
+	int randy = 0 + (rand() % static_cast<int>(3 - 0 + 1));
+	std::string names[] = {"Loïc", "Johan", "Chafik", "Beco"};
+	_nick = "Bot_" + names[randy];
 	_user = "Bot";
 	_realName = "Bot";
 }
@@ -132,7 +134,6 @@ void Bot::runCommand(const std::string& sender, const std::string& command, cons
 	} else if (command == "INVITE") {
 		sendMessage("JOIN " + args + CRLF);
 	} else if (command == "KICK") {
-		srand(time(NULL));
 		int rdm = rand();
 		std::cout << "random: " << rdm << std::endl;
 		if (rdm % 2 == 0) {
