@@ -88,6 +88,9 @@ HEADERS		=	Irc.hpp \
 				TimeCommand.hpp \
 				InviteCommand.hpp \
 				KickCommand.hpp \
+				TopicCommand.hpp \
+				ListCommand.hpp \
+				QuitCommand.hpp \
 
 #===============================#
 #            OBJECTS            #
@@ -150,7 +153,7 @@ fclean: clean
 
 #       COMPILATION RULES       #
 
-${OBJS_DIR}/%.o: %.cpp ${MAKEFILE} #${HEADERS}
+${OBJS_DIR}/%.o: %.cpp ${MAKEFILE} ${HEADERS}
 	@mkdir -p ${OBJS_DIR}
 	@${CC} ${CFLAGS} -c $< -o $@ -I${INCS_DIR}
 	@echo "[${NAME}] Compiling ${YELLOW}$<${WHITE}"

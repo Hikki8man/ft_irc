@@ -119,7 +119,6 @@ void Server::sendMessage(Client &toSendTo, const std::string& args, bool prefix)
 }
 
 void Server::do_cmd(Client& sender) {
-
 	std::cout << "msg received: " << sender.getBuffer() << std::endl;
 	while (sender.getBuffer().find("\r\n") != std::string::npos) {
 
@@ -238,7 +237,6 @@ int Server::recvMsgFrom(SocketIt socket) {
 		return 0;
 	}
 	if (n == 0) {
-		// need to remove client from clients list of channels
 		std::cout << sender.getIp() << " disconnected" << std::endl;
 		Command cmd;
 		sender.getBuffer().clear();

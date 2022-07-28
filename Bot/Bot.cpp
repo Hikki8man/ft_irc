@@ -134,9 +134,7 @@ void Bot::runCommand(const std::string& sender, const std::string& command, cons
 	} else if (command == "INVITE") {
 		sendMessage("JOIN " + args + CRLF);
 	} else if (command == "KICK") {
-		int rdm = rand();
-		std::cout << "random: " << rdm << std::endl;
-		if (rdm % 2 == 0) {
+		if (rand() % 2 == 0) {
 			sendMessage("JOIN " + channel + CRLF);
 			sendMessage("PRIVMSG " + channel + " :Tu croyais pouvoir te débarasser de moi comme ça ? " + CRLF);
 		} else
