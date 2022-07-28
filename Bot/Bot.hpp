@@ -28,7 +28,7 @@ class Bot {
 		int run();
 		void sendMessage(const std::string& message) const;
 		void parseCommand(const std::string& command);
-		void runCommand(const std::string& sender, const std::string& command, const std::string& args);
+		void runCommand(const std::string& sender, const std::string& command, const std::string& args, const std::string &chan = "");
 	private:
 		std::string _serverAddress, _password, _nick, _user, _realName;
 		struct sockaddr_in _addr;

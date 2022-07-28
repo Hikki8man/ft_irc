@@ -113,10 +113,17 @@ void Bot::parseCommand(const std::string &msg) {
 	std::cout << commandName << std::endl;
 	std::cout << commandArg << std::endl;
 	std::cout << commandSender << std::endl;
-	runCommand(commandSender, commandName, commandArg);
+	if (commandName == "KICK" || commandName == "PART") {
+		std::string chanName = message.substr(message.find_first_of(commandName));
+		chanName = chanName.substr(chanName.find_first_of(" ") + 1);
+		chanName = chanName.substr(0, chanName.find_first_of(" "));
+		std::cout << chanName << std::endl;
+		runCommand(commandSender, commandName, commandArg, chanName);
+	} else
+		runCommand(commandSender, commandName, commandArg);
 }
 
-void Bot::runCommand(const std::string& sender, const std::string& command, const std::string& args) {
+void Bot::runCommand(const std::string& sender, const std::string& command, const std::string& args, const std::string& channel) {
 	std::cout << "Command: '" << command << "' Sender: '" << sender << "' arg: '" << args << "'" << std::endl;
 	if (command == "JOIN") {
 		if (sender == _nick) {
@@ -127,12 +134,12 @@ void Bot::runCommand(const std::string& sender, const std::string& command, cons
 			sendMessage(message);
 		}
 	} else if (command == "INVITE") {
-		std::cout << "Invitation" << std::endl;
 		sendMessage("JOIN " + args + CRLF);
 	} else if (command == "KICK") {
 		// TODO une chance sur deux qu'il revienne dans le channel
 		sendMessage("PRIVMSG " + sender + " :Attend que je t'attrape toi ptit batard" + CRLF);
-	} else if (command == "PART" || command == "QUIT") {
-		// TODO envoyer un message mais il faut le nom du channel
+	} else if (command == "PART") {
+		std::string message = "PRIVMSG " + channel + " :Ah bah ok le reuf " + sender + " s'est barré super..." + CRLF;
+		sendMessage(message);
 	}
 }
