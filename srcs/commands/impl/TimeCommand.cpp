@@ -5,6 +5,7 @@
 
 void TimeCommand::execute(const Command& cmd, Client& sender) {
 
+	static_cast<void>(cmd);
 	time_t     now = time(0);
     struct tm  tstruct;
     char       buf[80];

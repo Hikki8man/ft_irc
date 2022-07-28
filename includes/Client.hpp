@@ -47,7 +47,7 @@ class Client {
 		void addChannel(const Channel& channel);
 		void removeChannel(Channel& channel);
 		bool isRegistered() const;
-		const bool isLogged() const;
+		bool isLogged() const;
 		bool isInChannel(const Channel& channel) const;
 
 		void sendMessage(int toSend, const std::string& message, bool prefix = true) const;

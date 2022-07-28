@@ -53,7 +53,7 @@ std::string Channel::getModes() const {
 	return _modes;
 }
 
-const int Channel::getLimit() const {
+int Channel::getLimit() const {
 	return _limit;
 }
 
@@ -160,7 +160,7 @@ void Channel::removeMode(char mode) {
 	_modes.erase(_modes.find(mode), 1);
 }
 
-const bool Channel::hasMode(char mode) const {
+bool Channel::hasMode(char mode) const {
 	return _modes.find(mode) != std::string::npos;
 }
 
@@ -178,7 +178,7 @@ void Channel::removeInvite(const Client& client) {
 	}
 }
 
-const bool Channel::isInvited(const Client& client) const {
+bool Channel::isInvited(const Client& client) const {
 	return std::count(_invites.begin(), _invites.end(), client.getSocket()) == 1;
 }
 

@@ -39,7 +39,7 @@ class Channel {
 
 		const std::string getName() const;
 		const std::string getKey() const;
-		const int getLimit() const;
+		int getLimit() const;
 		const std::map<SOCKET, char>& getClientsAndMode() const;
 		char getClientMode(const SOCKET&) const;
 		const std::string getTopic() const;
@@ -52,11 +52,11 @@ class Channel {
 		void removeClient(const Client&, const std::string& cmd, const std::string& reason = "");
 		void addInvite(const Client&);
 		void removeInvite(const Client&);
-		const bool isInvited(const Client&) const;
+		bool isInvited(const Client&) const;
 
 		void addMode(char mode);
 		void removeMode(char mode);
-		const bool hasMode(char mode) const;
+		bool hasMode(char mode) const;
 		
 	private:
 
@@ -67,7 +67,7 @@ class Channel {
 		std::vector<SOCKET>			_invites;
 		std::string					_modes;
 		std::string					_topic, _topicCreatorAndWhen;
-		int							_limit;
+		size_t						_limit;
 };
 
 #endif

@@ -72,7 +72,7 @@ const std::string Server::getPassword() const {
 	return _password;
 }
 
-const SOCKET Server::getSocket() const {
+SOCKET Server::getSocket() const {
 	return _srv_fd;
 }
 
@@ -203,7 +203,7 @@ int Server::createServerSocket(int port) {
 int Server::newConnection() {
 	std::cout << "creating new connection" << std::endl;
 	SOCKET new_socket;
-	struct sockaddr_in client_addr = {0};
+	struct sockaddr_in client_addr = {0, 0, 0, {0}, {0}};
 	socklen_t client_addr_len = sizeof(client_addr);
 
 
