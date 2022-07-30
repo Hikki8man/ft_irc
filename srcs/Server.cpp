@@ -28,6 +28,14 @@ bool Server::nickIsUsed(const std::string& nick) {
 	return false;
 }
 
+bool Server::userIsUsed(const std::string& user) {
+	for (ClientIt it = _clients.begin(); it != _clients.end(); it++) {
+		if (it->second.getUsername() == user)
+			return true;
+	}
+	return false;
+}
+
 
 /******************/
 /*     Getters    */

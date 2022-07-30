@@ -37,6 +37,7 @@ class Server {
 		int run(int port);
 
 		bool nickIsUsed(const std::string&);
+		bool userIsUsed(const std::string&);
 
 		// Send Reply to client
 		void sendMessage(int toSend, const std::string& message, bool prefix = true) const;
