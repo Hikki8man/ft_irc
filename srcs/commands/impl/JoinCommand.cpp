@@ -43,7 +43,6 @@ void JoinCommand::execute(const Command& cmd, Client& sender)
 			else {
 				channel->second.addClient(sender);
 			}
-			sender.addChannel(channel->second);
 		}
 	}	
 }

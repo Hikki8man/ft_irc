@@ -110,7 +110,7 @@ void Channel::addClient(Client& client, const std::string& key) {
 	// Check if the client is already in the channel
 	if (_clientsAndMode.find(client.getSocket()) != _clientsAndMode.end())
 		return;
-	else if (_key != key) {
+	else if (_key != key && hasMode(KEY)) {
 		Irc::getInstance().getServer()->send_err_badchannelkey(client, _name);
 		return;
 	} else if (hasMode(LIMIT) && _clientsAndMode.size() >= _limit) {
@@ -130,6 +130,7 @@ void Channel::addClient(Client& client, const std::string& key) {
 		Irc::getInstance().getServer()->send_rpl_topic(client, *this);
 		Irc::getInstance().getServer()->send_rpl_topicwhotime(client, *this);
 	}
+	client.addChannel(*this);
 	Irc::getInstance().getServer()->send_rpl_namreply(client, *this);
 	Irc::getInstance().getServer()->send_rpl_endofnames(client, *this);
 }
