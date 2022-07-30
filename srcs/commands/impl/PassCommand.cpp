@@ -13,7 +13,7 @@ void PassCommand::execute(const Command& cmd, Client& sender) {
 		// TODO close connection with ERROR
 		return;
 	}
-	if (sender.isRegistered()) {
+	if (sender.isLogged()) {
 		Irc::getInstance().getServer()->send_err_alreadyregistered(sender);
 		return;
 	}
