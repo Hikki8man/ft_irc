@@ -22,7 +22,6 @@ void UserCommand::execute(const Command& cmd, Client& sender)
 		Irc::getInstance().getServer()->sendMessage(sender, "NOTICE " + nick + " :Username is already used.");
 	}
 	else {
-		// send notice if username is invalid ?
 		std::string user(args[0]);
 		if (user.length() > USERLEN)
 			user = user.substr(0, USERLEN);

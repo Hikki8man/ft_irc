@@ -10,7 +10,6 @@ void PassCommand::execute(const Command& cmd, Client& sender) {
 
 	if (args.size() == 0) {
 		Irc::getInstance().getServer()->send_err_needmoreparams(sender, "PASS");
-		// TODO close connection with ERROR
 		return;
 	}
 	if (sender.isLogged()) {
