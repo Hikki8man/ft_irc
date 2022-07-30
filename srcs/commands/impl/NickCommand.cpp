@@ -15,7 +15,8 @@ void NickCommand::execute(const Command& cmd, Client& sender)
 	}
 	// verify of characters are valid
 	std::string nick(args[0]);
-	if (nick.find_first_of(" ,*!?@.") != std::string::npos || nick.find_first_of("$:#&", 0, 1) != std::string::npos) {
+	std::cout << (nick.find_first_of(" ,*!?@.") != std::string::npos) << " " << (nick.substr(0, 1).find_first_of("$:#&") != std::string::npos) << std::endl;
+	if (nick.find_first_of(" ,*!?@.") != std::string::npos || nick.substr(0, 1).find_first_of("$:#&") != std::string::npos) {
 		Irc::getInstance().getServer()->send_err_erroneusnickname(sender, nick);
 		return;
 	}
